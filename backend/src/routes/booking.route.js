@@ -9,7 +9,7 @@ const validate = require("../middlewares/validate.middleware");
 const {
   createBookingSchema,
   rejectBookingSchema,
-} = require("../validators/booking.validator");
+} = require("../schemas/booking.schema");
 
 const router = express.Router();
 

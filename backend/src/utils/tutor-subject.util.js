@@ -1,6 +1,6 @@
 const { Subject } = require('../models');
 
-const NotFoundError = require('../errors/not-found.error');
+const { NotFoundError } = require('../errors/app.error');
 
   const tutorSubjectInclude = [
   {

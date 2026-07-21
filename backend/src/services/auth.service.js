@@ -7,8 +7,7 @@ const env = require("../config/env");
 const { generateToken } = require("../utils/jwt.util");
 const { getUserResponse } = require("../utils/user.util");
 
-const ConflictError = require("../errors/conflict.error");
-const UnauthorizedError = require("../errors/unauthorized.error");
+const { ConflictError, UnauthorizedError } = require("../errors/app.error"); 
 
 const register = async ({
   full_name,
@@ -29,7 +28,7 @@ const register = async ({
 
   const hashedPassword = await bcrypt.hash(
     password,
-    env.security.bcryptSaltRounds
+    env.security.saltRounds
   );
 
   const transaction = await sequelize.transaction();
@@ -57,7 +56,16 @@ const register = async ({
 
     else if (role === "TUTOR") {
       await TutorProfile.create(
-        { user_id: user.user_id },
+        {
+          user_id: user.user_id,
+          professional_bio: "",
+          hourly_rate: 0,
+          teaching_mode: "ONLINE",
+          is_available: false,
+          avg_rating: 0,
+          total_completed_sessions: 0,
+          total_earnings: 0,
+        },
         { transaction }
       );
     }

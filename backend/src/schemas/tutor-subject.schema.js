@@ -3,18 +3,17 @@ const Joi = require("joi");
 const addSubjectsSchema = Joi.object({
   subject_ids: Joi.array()
     .items(
-      Joi.number()
-        .integer()
-        .positive()
+      Joi.string()
+        .uuid()
+        .required()
     )
     .min(1)
-    .required(),
+    .required()
 });
 
 const removeSubjectSchema = Joi.object({
-  subject_id: Joi.number()
-    .integer()
-    .positive()
+  subject_id: Joi.string()
+    .uuid()
     .required(),
 });
 

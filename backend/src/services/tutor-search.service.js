@@ -1,8 +1,11 @@
 const {
-  TutorProfile,
-  User,
-  Subject,
-} = require("../models");
+  findTutors,
+  findTutorById,
+  formatTutorList,
+  formatTutorProfile,
+  tutorProfileInclude,
+  tutorSearchInclude,
+} = require("../utils/tutor-profile.util");
 
 const {
   buildUserFilters,
@@ -10,6 +13,11 @@ const {
   buildSubjectFilter,
   buildSort,
 } = require("../utils/tutor-query.util");
+
+const {
+  getTutorAvailability,
+  formatAvailabilityList,
+} = require("../utils/tutor-availability.util");
 
 const {
   getPagination,
@@ -30,30 +38,16 @@ const getTutors = async (filters) => {
     filters.limit
   );
 
-  const { count, rows } = await TutorProfile.findAndCountAll({
+  const { count, rows } = await findTutors({
     where: tutorWhere,
 
     include: [
       {
-        model: User,
-        as: "user",
+        ...tutorSearchInclude[0],
         where: userWhere,
-        attributes: [
-          "user_id",
-          "full_name",
-          "city",
-        ],
       },
       {
-        model: Subject,
-        as: "subjects",
-        attributes: [
-          "subject_id",
-          "subject_name",
-        ],
-        through: {
-          attributes: [],
-        },
+        ...tutorSearchInclude[1],
         where: subjectFilter.where,
         required: subjectFilter.required,
       },
@@ -62,16 +56,46 @@ const getTutors = async (filters) => {
     order,
     limit,
     offset,
-
-    distinct: true,
   });
 
   return {
-    ...getPaginationMeta(count, page, limit),
-    tutors: rows,
+    tutors: formatTutorList(rows),
+    pagination: getPaginationMeta(
+      count,
+      page,
+      limit
+    ),
   };
+};
+
+const getTutorById = async (
+  tutor_profile_id
+) => {
+  const tutor = await findTutorById(
+    tutor_profile_id,
+    {
+      include: tutorProfileInclude,
+    }
+  );
+
+  return formatTutorProfile(tutor);
+};
+
+const getTutorAvailabilityByTutor = async (
+  tutor_profile_id
+) => {
+  const availability =
+    await getTutorAvailability(
+      tutor_profile_id
+    );
+
+  return formatAvailabilityList(
+    availability
+  );
 };
 
 module.exports = {
   getTutors,
+  getTutorById,
+  getTutorAvailabilityByTutor,
 };

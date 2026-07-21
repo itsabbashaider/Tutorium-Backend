@@ -1,19 +1,24 @@
 const { Review } = require("../models");
 
-const BadRequestError = require("../errors/bad-request.error");
+const { BadRequestError } = require("../errors/app.error");
+
+const {
+  getPagination,
+  getPaginationMeta,
+} = require("../utils/pagination.util");
 
 const {
   findStudentProfile,
 } = require("../utils/student-profile.util");
 
 const {
+  findTutorProfileById,
   findTutorProfile,
   updateTutorRatingStats,
 } = require("../utils/tutor-profile.util");
 
 const {
   findBooking,
-  verifyTutorBookingOwner,
 } = require("../utils/booking.util");
 
 const {
@@ -24,9 +29,10 @@ const {
 
   findReview,
   findReviewByBooking,
-  getTutorReviews,
+  getTutorReviews: getTutorReviewsFromDB,
 
-  verifyReviewOwner,
+  verifyBookingReviewOwner,
+  verifyTutorReviewOwner,
   canReviewBooking,
 } = require("../utils/review.util");
 
@@ -42,7 +48,7 @@ const createReview = async (
     booking_id
   );
 
-  verifyReviewOwner(
+  verifyBookingReviewOwner(
     booking,
     studentProfile
   );
@@ -70,7 +76,7 @@ const createReview = async (
   });
 
   const tutorProfile =
-    await findTutorProfile(
+    await findTutorProfileById(
       booking.tutor_profile_id
     );
 
@@ -90,20 +96,37 @@ const createReview = async (
 };
 
 const getMyReviews = async (
-  user_id
+  user_id,
+  query
 ) => {
   const tutorProfile =
     await findTutorProfile(user_id);
+    
 
-  const reviews =
-    await getTutorReviews(
+  const { page, limit, offset } =
+    getPagination(
+      query.page,
+      query.limit
+    );
+
+  const { count, rows } =
+    await getTutorReviewsFromDB(
       tutorProfile.tutor_profile_id,
       {
         include: reviewInclude,
+        limit,
+        offset,
       }
     );
 
-  return formatReviewList(reviews);
+  return {
+    reviews: formatReviewList(rows),
+    pagination: getPaginationMeta(
+      count,
+      page,
+      limit
+    ),
+  };
 };
 
 const getReviewById = async (
@@ -122,7 +145,7 @@ const getReviewById = async (
     const studentProfile =
       await findStudentProfile(user_id);
 
-    verifyReviewOwner(
+    verifyBookingReviewOwner(
       review.booking,
       studentProfile
     );
@@ -130,18 +153,47 @@ const getReviewById = async (
     const tutorProfile =
       await findTutorProfile(user_id);
 
-    verifyTutorBookingOwner(
-      tutorProfile,
-      review.booking
+    verifyTutorReviewOwner(
+      review,
+      tutorProfile
     );
   }
 
   return formatReview(review);
 };
 
+const getTutorReviews = async (
+  tutor_profile_id,
+  query
+) => {
+  const { page, limit, offset } =
+    getPagination(query.page, query.limit);
+
+  const { count, rows } =
+    await getTutorReviewsFromDB(
+      tutor_profile_id,
+      {
+        include: reviewInclude,
+        limit,
+        offset,
+      }
+    );
+
+
+  return {
+    reviews: formatReviewList(rows),
+    pagination: getPaginationMeta(
+      count,
+      page,
+      limit
+    ),
+  };
+};
+
 module.exports = {
   createReview,
 
   getMyReviews,
+  getTutorReviews,
   getReviewById,
 };

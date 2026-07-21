@@ -2,15 +2,18 @@ const express = require("express");
 
 const authRoutes = require("./auth.route");
 
-const tutorSearchRoutes = require("./tutor-profile.route");
+const tutorSearchRoutes = require("./tutor.route");
 const tutorProfileRoutes = require("./tutor-profile.route");
 const tutorSubjectRoutes = require("./tutor-subject.route");
 const tutorAvailabilityRoutes = require("./totur-avail.route");
 
-const bookingRoutes = require('./booking.route')
-const reviewRoutes = require('./review.route')
+const bookingRoutes = require('./booking.route');
+const reviewRoutes = require('./review.route');
+const dashboardRoutes = require("./dashboard.route");
 
 const studentProfileRoutes = require("./student-profile.route");
+
+const subjectRoutes = require("./subjects.route");
 
 const router = express.Router();
 
@@ -29,5 +32,11 @@ router.use("/student/profile", studentProfileRoutes);
 
 // Reviews
 router.use("/reviews", reviewRoutes);
+
+// Subjects
+router.use("/subjects", subjectRoutes);
+
+// Dashboard
+router.use("/dashboard", dashboardRoutes);
 
 module.exports = router;

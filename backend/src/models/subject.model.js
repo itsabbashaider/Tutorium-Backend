@@ -1,10 +1,12 @@
+const { v7: uuidv7 } = require("uuid");
+
 module.exports = (sequelize, DataTypes) => {
   const Subject = sequelize.define(
     "Subject",
     {
       subject_id: {
         type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
+        defaultValue: () => uuidv7(),
         primaryKey: true,
         allowNull: false,
       },
@@ -35,6 +37,7 @@ module.exports = (sequelize, DataTypes) => {
       as: "tutors",
     });
 
+    
     Subject.hasMany(models.Booking, {
       foreignKey: "subject_id",
       as: "bookings",

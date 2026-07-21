@@ -3,7 +3,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
 const STATUS_CODES = require('./constants/status-codes.constant')
-const config = require("./config/config"); 
+const env = require("./config/env"); 
 
 const router = require("./routes");
 const errorHandler = require("./middlewares/error-handler.middleware");
@@ -12,7 +12,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: config.frontend.url, 
+    origin: env.app.frontendUrl, 
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],

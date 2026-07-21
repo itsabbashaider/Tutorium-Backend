@@ -15,17 +15,25 @@ const router = express.Router();
 
 router.use(authenticate);
 
+// Student
 router.post(
-  "/bookings/:booking_id",
+  "/",
   authorize("STUDENT"),
   validate(createReviewSchema),
   reviewController.createReview
 );
 
+// Tutor
 router.get(
-  "/",
+  "/my",
   authorize("TUTOR"),
-  reviewController.getReviews
+  reviewController.getMyReviews
+);
+
+// Public / Shared
+router.get(
+  "/tutor/:tutor_profile_id",
+  reviewController.getTutorReviews
 );
 
 router.get(

@@ -1,10 +1,16 @@
-const combineBookingDateTime = (
-  booking_date,
-  time
-) => {
-  return new Date(
-    `${booking_date}T${time}`
+const combineBookingDateTime = (booking_date, time) => {
+  const date = new Date(booking_date);
+
+  const [hours, minutes, seconds = "00"] = time.split(":");
+
+  date.setHours(
+    Number(hours),
+    Number(minutes),
+    Number(seconds),
+    0
   );
+
+  return date;
 };
 
 const isBookingInPast = (

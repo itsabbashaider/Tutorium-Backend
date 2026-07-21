@@ -4,7 +4,7 @@ const authController = require('../controllers/auth.controller');
 
 const validateRequest = require('../middlewares/validate.middleware');
 const AsyncHandler = require('../middlewares/async-handler.middleware');
-const protect = require('../middlewares/auth.middleware');
+const authenticate = require('../middlewares/auth.middleware');
 
 const {
         signupSchema,
@@ -33,7 +33,7 @@ router.post(
 
 router.get(
   "/me",
-  protect,
+  authenticate,
   AsyncHandler(authController.getMe)
 );
 

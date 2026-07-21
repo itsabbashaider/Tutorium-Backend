@@ -1,7 +1,7 @@
 const { Booking, Review } = require("../models");
 
-const NotFoundError = require("../errors/not-found.error");
-const ForbiddenError = require("../errors/forbidden.error");
+const { NotFoundError } = require("../errors/app.error");
+const { ForbiddenError } = require("../errors/app.error");
 
 const reviewInclude = [
   {
@@ -60,7 +60,7 @@ const getTutorReviews = async (
   tutor_profile_id,
   options = {}
 ) => {
-  return await Review.findAll({
+  return await Review.findAndCountAll({
     include: [
       {
         model: Booking,
@@ -73,11 +73,12 @@ const getTutorReviews = async (
     order: [
       ["created_at", "DESC"],
     ],
+    distinct: true,
     ...options,
   });
 };
 
-const verifyReviewOwner = (
+const verifyBookingReviewOwner = (
   booking,
   studentProfile
 ) => {
@@ -101,6 +102,20 @@ const canReviewBooking = (
   );
 };
 
+const verifyTutorReviewOwner = (
+  review,
+  tutorProfile
+) => {
+  if (
+    review.booking.tutor_profile_id !==
+    tutorProfile.tutor_profile_id
+  ) {
+    throw new ForbiddenError(
+      "You do not have permission to access this review."
+    );
+  }
+};
+
 module.exports = {
   reviewInclude,
 
@@ -111,6 +126,7 @@ module.exports = {
   findReviewByBooking,
   getTutorReviews,
 
-  verifyReviewOwner,
+  verifyBookingReviewOwner,
+  verifyTutorReviewOwner,
   canReviewBooking,
 };

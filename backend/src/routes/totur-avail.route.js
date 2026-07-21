@@ -1,6 +1,6 @@
 const express = require("express");
 
-const tutorAvailabilityController = require("../controllers/tutor-availability.controller");
+const tutorAvailabilityController = require("../controllers/tutor-avail.controller");
 
 const authenticate = require("../middlewares/auth.middleware");
 const authorize = require("../middlewares/authorize.middleware");
@@ -37,5 +37,6 @@ router.delete(
   "/:availability_slot_id",
   tutorAvailabilityController.deleteAvailability
 );
+
 
 module.exports = router;

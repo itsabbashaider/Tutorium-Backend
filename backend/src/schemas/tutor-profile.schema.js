@@ -3,15 +3,16 @@ const Joi = require("joi");
 const updateTutorProfileSchema = Joi.object({
   professional_bio: Joi.string()
     .max(1000)
-    .optional(),
+    .required(),
 
   hourly_rate: Joi.number()
-    .min(0)
-    .optional(),
+    .positive()
+    .precision(2)
+    .required(),
 
   teaching_mode: Joi.string()
     .valid("ONLINE", "IN_PERSON", "BOTH")
-    .optional(),
+    .required(),
 });
 
 module.exports = {

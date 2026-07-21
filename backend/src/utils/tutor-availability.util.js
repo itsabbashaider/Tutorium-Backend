@@ -1,7 +1,7 @@
 const { TutorAvailability } = require('../models');
 
-const NotFoundError = require('../errors/not-found.error');
-const ForbiddenError = require('../errors/forbidden.error');
+const { NotFoundError } = require('../errors/app.error');
+const { ForbiddenError } = require('../errors/app.error');
 
 const formatAvailability = (slot) => ({
   availability_slot_id: slot.availability_slot_id,

@@ -1,7 +1,7 @@
-const AppError = require('../errors/app.error');
-const STATUS_CODES = require('../constants/statusCodes.constant');
+const { AppError } = require('../errors/app.error');
+const STATUS_CODES = require('../constants/status-codes.constant');
 
-exports.authorize = (...roles) => {
+const authorize = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
       return next(
@@ -14,3 +14,5 @@ exports.authorize = (...roles) => {
     next();
   };
 };
+
+module.exports = authorize;

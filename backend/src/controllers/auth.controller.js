@@ -7,6 +7,8 @@ const asyncHandler = require("../middlewares/async-handler.middleware");
 const { getCookieOptions } = require("../utils/cookie.util");
 
 const register = asyncHandler(async (req, res) => {
+  console.log(req.body);
+  
   const user = await authService.register(req.body);
 
   return res.status(STATUS_CODES.CREATED).json({

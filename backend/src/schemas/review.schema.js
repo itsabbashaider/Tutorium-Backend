@@ -1,6 +1,9 @@
 const Joi = require("joi");
 
 const createReviewSchema = Joi.object({
+  booking_id: Joi.string()
+    .required(),
+
   rating: Joi.number()
     .integer()
     .min(1)
@@ -12,6 +15,12 @@ const createReviewSchema = Joi.object({
       "number.max":
         "Rating must be between 1 and 5.",
     }),
+
+  comment: Joi.string()
+    .trim()
+    .max(1000)
+    .allow("")
+    .optional(),
 
   review_text: Joi.string()
     .max(1000)

@@ -1,10 +1,12 @@
+const { v7: uuidv7 } = require("uuid");
+
 module.exports = (sequelize, DataTypes) => {
   const TutorProfile = sequelize.define(
     "TutorProfile",
     {
       tutor_profile_id: {
         type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
+        defaultValue: () => uuidv7(),
         primaryKey: true,
         allowNull: false,
       },
@@ -18,11 +20,13 @@ module.exports = (sequelize, DataTypes) => {
       professional_bio: {
         type: DataTypes.TEXT,
         allowNull: true,
+        defaultValue: "",
       },
 
       hourly_rate: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
+        defaultValue: 0,
         validate: {
           min: 0,
           isDecimal: true,
@@ -32,12 +36,13 @@ module.exports = (sequelize, DataTypes) => {
       teaching_mode: {
         type: DataTypes.ENUM("ONLINE", "IN_PERSON", "BOTH"),
         allowNull: false,
+        defaultValue: "ONLINE",
       },
 
       is_available: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
-        defaultValue: true,
+        defaultValue: false,
       },
 
       avg_rating: {

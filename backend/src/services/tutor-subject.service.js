@@ -1,4 +1,4 @@
-const NotFoundError = require('../errors/not-found.error');
+const { NotFoundError } = require('../errors/app.error');
 
 const { findTutorProfile } = require('../utils/tutor-profile.util');
 const {

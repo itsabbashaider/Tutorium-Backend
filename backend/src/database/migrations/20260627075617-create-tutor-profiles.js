@@ -1,11 +1,12 @@
 'use strict';
 
+const { defaultValueSchemable } = require("sequelize/lib/utils");
+
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('tutor_profiles', {
       tutor_profile_id: {
         type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
         allowNull: false,
       },
@@ -23,19 +24,22 @@ module.exports = {
       professional_bio: {
         type: Sequelize.TEXT,
         allowNull: true,
+        defaultValue: "",
       },
       hourly_rate: {
         type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
+        defaultValue: 0,
       },
       teaching_mode: {
         type: Sequelize.ENUM('ONLINE', 'IN_PERSON', 'BOTH'),
         allowNull: false,
+        defaultValue: "online",
       },
       is_available: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: true,
+        defaultValue: false,
       },
       avg_rating: {
         type: Sequelize.DECIMAL(3, 2),

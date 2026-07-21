@@ -1,12 +1,19 @@
 const { Booking } = require('../models');
 
-const BadRequestError = require('../errors/bad-request.error');
-const ConflictError = require('../errors/conflict.error');
+const {
+  BadRequestError,
+  ConflictError,
+} = require("../errors/app.error");
 
 const { findStudentProfile } = require('../utils/student-profile.util');
-const { findTutorProfile, updateTutorCompletedStats } = require('../utils/tutor-profile.util');
+const { findTutorProfileById, updateTutorCompletedStats, findTutorProfile } = require('../utils/tutor-profile.util');
 const { findAvailability } = require('../utils/tutor-availability.util');
 const { findSubjectById } = require('../utils/tutor-subject.util');
+
+const {
+  getPagination,
+  getPaginationMeta,
+} = require("../utils/pagination.util");
 
 const {
   combineBookingDateTime,
@@ -37,7 +44,7 @@ const {
 const createBooking = async (user_id, data) => {
   const studentProfile = await findStudentProfile(user_id);
 
-  const tutorProfile = await findTutorProfile(data.tutor_profile_id);
+  const tutorProfile = await findTutorProfileById(data.tutor_profile_id);
 
   await findSubjectById(data.subject_id);
 
@@ -87,6 +94,7 @@ const createBooking = async (user_id, data) => {
       "Tutor does not teach the selected subject."
     );
   }
+  
 
   const booking_start =
     combineBookingDateTime(
@@ -147,37 +155,77 @@ const createBooking = async (user_id, data) => {
 };
 
 
-const getStudentBookings = async (user_id) => {
-  const studentProfile = await findStudentProfile(user_id);
+const getStudentBookings = async (
+  user_id,
+  query
+) => {
+  const studentProfile =
+    await findStudentProfile(user_id);
 
-  const bookings = await getBookings(
-    {
-      student_profile_id:
-        studentProfile.student_profile_id,
-    },
-    {
-      include: bookingInclude,
-    }
-  );
+  const { page, limit, offset } =
+    getPagination(
+      query.page,
+      query.limit
+    );
 
-  return formatBookingList(bookings);
+  const { count, rows } =
+    await getBookings(
+      {
+        student_profile_id:
+          studentProfile.student_profile_id,
+      },
+      {
+        include: bookingInclude,
+        limit,
+        offset,
+      }
+    );
+
+  return {
+    bookings: formatBookingList(rows),
+    pagination: getPaginationMeta(
+      count,
+      page,
+      limit
+    ),
+  };
 };
 
 
-const getTutorBookings = async (user_id) => {
-  const tutorProfile = await findTutorProfile(user_id);
+const getTutorBookings = async (
+  user_id,
+  query
+) => {
+  const tutorProfile =
+    await findTutorProfile(user_id);
 
-  const bookings = await getBookings(
-    {
-      tutor_profile_id:
-        tutorProfile.tutor_profile_id,
-    },
-    {
-      include: bookingInclude,
-    }
-  );
+  const { page, limit, offset } =
+    getPagination(
+      query.page,
+      query.limit
+    );
 
-  return formatBookingList(bookings);
+  const { count, rows } =
+    await getBookings(
+      {
+        tutor_profile_id:
+          tutorProfile.tutor_profile_id,
+      },
+      {
+        include: bookingInclude,
+        limit,
+        offset,
+      }
+    );
+
+  return {
+    bookings: formatBookingList(rows),
+    pagination: getPaginationMeta(
+      count,
+      page,
+      limit
+    ),
+  };
 };
 
 

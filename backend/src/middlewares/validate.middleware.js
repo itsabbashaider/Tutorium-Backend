@@ -1,5 +1,5 @@
 // ─── Dependencies ─────────────────────────────────────────────────────────────
-const { ValidationError } = require('../errors');
+const { ValidationError } = require('../errors/app.error');
 
 // ─── Validate Request ─────────────────────────────────────────────────────────
 const validateRequest = (schema, source = 'body') => (req, res, next) => {

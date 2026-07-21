@@ -6,6 +6,5 @@ const availabilityFields = [
 ];
 
 module.exports = {
-  ...
   availabilityFields,
 };

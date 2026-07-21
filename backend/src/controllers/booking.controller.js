@@ -25,7 +25,8 @@ const getStudentBookings = asyncHandler(async (
 ) => {
   const bookings =
     await bookingService.getStudentBookings(
-      req.user.user_id
+      req.user.user_id,
+      req.query
     );
 
   return res.json({
@@ -40,7 +41,8 @@ const getTutorBookings = asyncHandler(async (
 ) => {
   const bookings =
     await bookingService.getTutorBookings(
-      req.user.user_id
+      req.user.user_id,
+      req.query
     );
 
   return res.json({

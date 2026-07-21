@@ -4,7 +4,7 @@ const router = express.Router();
 
 const tutorSubjectController = require("../controllers/tutor-subject.controller");
 
-const protect = require("../middlewares/auth.middleware");
+const authenticate = require("../middlewares/auth.middleware");
 const authorize = require("../middlewares/authorize.middleware");
 const validate = require("../middlewares/validate.middleware");
 const asyncHandler = require("../middlewares/async-handler.middleware");
@@ -16,14 +16,14 @@ const {
 
 router.get(
   "/",
-  protect,
+  authenticate,
   authorize("TUTOR"),
   asyncHandler(tutorSubjectController.getSubjects)
 );
 
 router.post(
   "/",
-  protect,
+  authenticate,
   authorize("TUTOR"),
   validate(addSubjectsSchema),
   asyncHandler(tutorSubjectController.addSubjects)
@@ -31,7 +31,7 @@ router.post(
 
 router.delete(
   "/:subject_id",
-  protect,
+  authenticate,
   authorize("TUTOR"),
   validate(removeSubjectSchema, "params"),
   asyncHandler(tutorSubjectController.removeSubject)

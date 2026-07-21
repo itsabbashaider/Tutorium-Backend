@@ -5,7 +5,6 @@ module.exports = {
     await queryInterface.createTable('tutor_availability', {
       availability_slot_id: {
         type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
         allowNull: false,
       },

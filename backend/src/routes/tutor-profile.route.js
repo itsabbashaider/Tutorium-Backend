@@ -2,10 +2,9 @@ const express = require("express");
 
 const router = express.Router();
 
-const tutorProfileController = require("../controllers/tutor-profile.controller");
-const tutorSearchController = require('../controllers/tutor-search.controller');
+const tutorProfileController = require("../controllers/totur-profile.controller");
 
-const protect = require("../middlewares/auth.middleware");
+const authenticate = require("../middlewares/auth.middleware");
 const authorize = require("../middlewares/authorize.middleware");
 const validate = require("../middlewares/validate.middleware");
 const asyncHandler = require("../middlewares/async-handler.middleware");
@@ -14,25 +13,21 @@ const {
   updateTutorProfileSchema,
 } = require("../schemas/tutor-profile.schema");
 
+
 router.get(
   "/",
-  protect,
+  authenticate,
   authorize("TUTOR"),
   asyncHandler(tutorProfileController.getProfile)
 );
 
 router.patch(
   "/",
-  protect,
+  authenticate,
   authorize("TUTOR"),
   validate(updateTutorProfileSchema),
   asyncHandler(tutorProfileController.updateProfile)
 );
 
-router.get(
-  "/",
-  validate(tutorSearchSchema, "query"),
-  asyncHandler(tutorSearchController.searchTutors)
-);
 
 module.exports = router;

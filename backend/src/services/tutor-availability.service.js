@@ -1,11 +1,12 @@
 const { TutorAvailability } = require("../models");
 
-const BadRequestError = require("../errors/bad-request.error");
-const ConflictError = require("../errors/conflict.error");
+const { BadRequestError, ConflictError } = require("../errors/app.error");
 
 const { findTutorProfile } = require("../utils/tutor-profile.util");
 
-const availabilityFields = require('../constants/tutor-avail.constant');
+const { 
+  availabilityFields,
+ } = require('../constants/tutor-avail.constant');
 
 const {
   pickFields,

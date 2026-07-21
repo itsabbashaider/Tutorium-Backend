@@ -3,7 +3,7 @@ const {
   User,
 } = require("../models");
 
-const NotFoundError = require("../errors/not-found.error");
+const { NotFoundError } = require("../errors/app.error");
 
 const studentProfileInclude = [
   {
@@ -57,9 +57,29 @@ const findStudentProfile = async (
   return studentProfile;
 };
 
+const findStudentProfileById = async (
+  student_profile_id,
+  options = {}
+) => {
+  const studentProfile =
+    await StudentProfile.findByPk(
+      student_profile_id,
+      options
+    );
+
+  if (!studentProfile) {
+    throw new NotFoundError(
+      "Student profile not found."
+    );
+  }
+
+  return studentProfile;
+};
+
 
 module.exports = {
   studentProfileInclude,
   formatStudentProfile,
   findStudentProfile,
+  findStudentProfileById
 };

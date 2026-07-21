@@ -9,8 +9,8 @@ const {
   TutorAvailability,
 } = require('../models');
 
-const NotFoundError = require('../errors/not-found.error');
-const ForbiddenError = require('../errors/forbidden.error');
+const { NotFoundError } = require('../errors/app.error');
+const { ForbiddenError } = require('../errors/app.error');
 
 const bookingInclude = [
   {
@@ -215,10 +215,11 @@ const getBookings = async (
   where,
   options = {}
 ) => {
-  return Booking.findAll({
+  return Booking.findAndCountAll({
     where,
     order: [["created_at", "DESC"]],
     ...options,
+    distinct: true,
   });
 };
 

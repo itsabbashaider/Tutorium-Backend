@@ -1,10 +1,12 @@
+const { v7: uuidv7 } = require("uuid");
+
 module.exports = (sequelize, DataTypes) => {
   const TutorAvailability = sequelize.define(
     "TutorAvailability",
     {
       availability_slot_id: {
         type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
+        defaultValue: () => uuidv7(),
         primaryKey: true,
         allowNull: false,
       },

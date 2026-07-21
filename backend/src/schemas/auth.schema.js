@@ -2,7 +2,7 @@ const Joi = require('joi');
 
 // ─── SIGNUP/REGISTRATION SCHEMA ──────────────────────────────────────────────
 exports.signupSchema = Joi.object({
-  fullName: Joi.string()
+  full_name: Joi.string()
     .trim()
     .min(3)
     .max(50)
@@ -43,7 +43,7 @@ exports.signupSchema = Joi.object({
       'any.required': 'City is required',
     }),
 
-  phoneNumber: Joi.string()
+  phone_number: Joi.string()
     .trim()
     .required()
     .messages({

@@ -29,7 +29,7 @@ const addSubjects = async (req, res) => {
 const removeSubject = async (req, res) => {
   const subjects = await tutorSubjectService.removeSubject(
     req.user.user_id,
-    Number(req.params.subject_id)
+    req.params.subject_id
   );
 
   return res.status(STATUS_CODES.OK).json({

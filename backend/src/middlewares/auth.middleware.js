@@ -8,7 +8,7 @@ const STATUS_CODES = require("../constants/status-codes.constant");
 
 const asyncHandler = require("./async-handler.middleware");
 
-exports.protect = asyncHandler(async (req, res, next) => {
+const authenticate = asyncHandler(async (req, res, next) => {
   const token = req.cookies.token;
 
   if (!token) {
@@ -37,3 +37,5 @@ exports.protect = asyncHandler(async (req, res, next) => {
 
   next();
 });
+
+module.exports = authenticate;

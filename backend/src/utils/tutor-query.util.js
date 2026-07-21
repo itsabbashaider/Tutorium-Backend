@@ -1,132 +1,85 @@
 const { Op } = require("sequelize");
 
-const {
-  TutorProfile,
-  User,
-  Subject,
-  TutorSubject,
-} = require("../models");
+const buildUserFilters = (filters) => {
+  const where = {};
 
-const getTutors = async (filters) => {
-  const {
-    subject,
-    city,
-    teaching_mode,
-    min_price,
-    max_price,
-    min_rating,
-    page = 1,
-    limit = 10,
-    sort_by = "top_rated",
-  } = filters;
-
-  const userWhere = {};
-  const tutorWhere = {};
-
-  // User filters
-  if (city) {
-    userWhere.city = {
-      [Op.iLike]: `%${city}%`,
+  if (filters.city) {
+    where.city = {
+      [Op.iLike]: `%${filters.city}%`,
     };
   }
 
-  // Tutor filters
-  if (teaching_mode) {
-    tutorWhere.teaching_mode = teaching_mode;
+  return where;
+};
+
+const buildTutorFilters = (filters) => {
+  const where = {}
+
+  if (filters.teaching_mode) {
+    where.teaching_mode = filters.teaching_mode;
   }
 
-  if (min_rating) {
-    tutorWhere.avg_rating = {
-      [Op.gte]: Number(min_rating),
+  if (filters.min_rating) {
+    where.avg_rating = {
+      [Op.gte]: Number(filters.min_rating),
     };
   }
 
-  if (min_price || max_price) {
-    tutorWhere.hourly_rate = {};
+  if (filters.min_price || filters.max_price) {
+    where.hourly_rate = {};
 
-    if (min_price) {
-      tutorWhere.hourly_rate[Op.gte] = Number(min_price);
+    if (filters.min_price) {
+      where.hourly_rate[Op.gte] = Number(filters.min_price);
     }
 
-    if (max_price) {
-      tutorWhere.hourly_rate[Op.lte] = Number(max_price);
+    if (filters.max_price) {
+      where.hourly_rate[Op.lte] = Number(filters.max_price);
     }
   }
 
-  // Sorting
-  let order = [];
+  return where;
 
-  switch (sort_by) {
-    case "lowest_price":
-      order = [["hourly_rate", "ASC"]];
-      break;
+}
 
-    case "highest_price":
-      order = [["hourly_rate", "DESC"]];
-      break;
-
-    case "recently_added":
-      order = [["created_at", "DESC"]];
-      break;
-
-    default:
-      order = [["avg_rating", "DESC"]];
+const buildSubjectFilter = (subject) => {
+  if (!subject) {
+    return {
+      where: undefined,
+      required: false,
+    };
   }
-
-  const offset = (page - 1) * limit;
-
-  const tutors = await TutorProfile.findAndCountAll({
-    where: tutorWhere,
-
-    include: [
-      {
-        model: User,
-        as: "user",
-        where: userWhere,
-        attributes: [
-          "user_id",
-          "full_name",
-          "city",
-        ],
-      },
-
-      {
-        model: Subject,
-        as: "subjects",
-        attributes: [
-          "subject_id",
-          "subject_name",
-        ],
-        through: {
-          attributes: [],
-        },
-        required: !!subject,
-        where: subject
-          ? {
-              subject_name: {
-                [Op.iLike]: `%${subject}%`,
-              },
-            }
-          : undefined,
-      },
-    ],
-
-    order,
-
-    limit: Number(limit),
-
-    offset,
-  });
 
   return {
-    total: tutors.count,
-    page: Number(page),
-    limit: Number(limit),
-    total_pages: Math.ceil(tutors.count / limit),
-    tutors: tutors.rows,
+    where: {
+      subject_name: {
+        [Op.iLike]: `%${subject}%`,
+      },
+    },
+    required: true,
   };
 };
 
-module.exports = {
-  getTutors,
+const buildSort = (sort_by = "top_rated") => {
+  switch (sort_by) {
+    case "lowest_price":
+      return [["hourly_rate", "ASC"]];
+
+    case "highest_price":
+      return [["hourly_rate", "DESC"]];
+
+    case "recently_added":
+      return [["created_at", "DESC"]];
+
+    case "top_rated":
+    default:
+      return [["avg_rating", "DESC"]];
+  }
 };
+
+
+module.exports = {
+  buildUserFilters,
+  buildTutorFilters,
+  buildSubjectFilter,
+  buildSort,
+}
