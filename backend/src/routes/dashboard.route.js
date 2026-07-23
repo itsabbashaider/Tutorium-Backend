@@ -1,8 +1,11 @@
 const express = require("express");
 
-const authenticate = require("../middlewares/auth.middleware");
+const {
+  authenticate,
+  authorize,
+} = require("../middlewares/auth.middleware");
 
-const authorize = require("../middlewares/authorize.middleware");
+
 
 const dashboardController = require("../controllers/dashboard.controller");
 

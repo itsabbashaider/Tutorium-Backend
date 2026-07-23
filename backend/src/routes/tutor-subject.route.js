@@ -4,8 +4,11 @@ const router = express.Router();
 
 const tutorSubjectController = require("../controllers/tutor-subject.controller");
 
-const authenticate = require("../middlewares/auth.middleware");
-const authorize = require("../middlewares/authorize.middleware");
+const {
+  authenticate,
+  authorize,
+} = require("../middlewares/auth.middleware");
+
 const validate = require("../middlewares/validate.middleware");
 const asyncHandler = require("../middlewares/async-handler.middleware");
 

@@ -38,4 +38,21 @@ const authenticate = asyncHandler(async (req, res, next) => {
   next();
 });
 
-module.exports = authenticate;
+const authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError(
+          "You are not authorized to perform this action.",
+          STATUS_CODES.FORBIDDEN
+        )
+      );
+    }
+    next();
+  };
+};
+
+module.exports = {
+  authenticate,
+  authorize,
+};

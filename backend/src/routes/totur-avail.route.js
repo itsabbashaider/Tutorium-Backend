@@ -2,8 +2,11 @@ const express = require("express");
 
 const tutorAvailabilityController = require("../controllers/tutor-avail.controller");
 
-const authenticate = require("../middlewares/auth.middleware");
-const authorize = require("../middlewares/authorize.middleware");
+const {
+  authenticate,
+  authorize,
+} = require("../middlewares/auth.middleware");
+
 const validate = require("../middlewares/validate.middleware");
 
 const {

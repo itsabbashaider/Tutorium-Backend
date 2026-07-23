@@ -4,7 +4,7 @@ const authController = require('../controllers/auth.controller');
 
 const validateRequest = require('../middlewares/validate.middleware');
 const AsyncHandler = require('../middlewares/async-handler.middleware');
-const authenticate = require('../middlewares/auth.middleware');
+const { authenticate } = require('../middlewares/auth.middleware');
 
 const {
         signupSchema,

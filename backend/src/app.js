@@ -34,4 +34,9 @@ app.use("/api", router);
 
 app.use(errorHandler);
 
-module.exports = app;
+app.listen(env.app.port, () => {
+  console.log(
+    `🚀 Tutorium API is running in ${env.app.nodeEnv} mode on http://localhost:${env.app.port}`
+  );
+});
+

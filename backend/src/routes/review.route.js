@@ -2,8 +2,10 @@ const express = require('express');
 
 const reviewController = require('../controllers/review.controller');
 
-const authenticate = require('../middlewares/auth.middleware');
-const authorize = require('../middlewares/authorize.middleware');
+const { 
+  authenticate,
+  authorize,
+ } = require('../middlewares/auth.middleware');
 
 const validate = require('../middlewares/validate.middleware');
 
