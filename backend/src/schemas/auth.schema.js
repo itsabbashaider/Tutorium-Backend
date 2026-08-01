@@ -78,9 +78,13 @@ exports.loginSchema = Joi.object({
     }),
 
   password: Joi.string()
+    .min(6)
+    .max(50)
+    .pattern(/^(?=(?:.*[A-Z]){1,})(?=(?:.*[a-z]){1,})(?=(?:.*\d){2,}).*$/)
     .required()
     .messages({
-      "any.required": "Password is required",
+      "string.pattern.base":
+        "Password must contain at least 1 uppercase letter, 1 lowercase letter, and 2 numbers",
     }),
 });
 
