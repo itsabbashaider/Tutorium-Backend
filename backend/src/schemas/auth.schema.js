@@ -1,148 +1,227 @@
 const Joi = require("joi");
 
-// ─── SIGNUP / REGISTRATION ───────────────────────────────────────────────────
-exports.signupSchema = Joi.object({
+/*
+|--------------------------------------------------------------------------
+| Shared password rule
+|--------------------------------------------------------------------------
+*/
+const passwordSchema = Joi.string()
+  .min(8)
+  .max(50)
+  .pattern(
+    /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$/
+  )
+  .messages({
+    "string.empty":
+      "Password is required.",
+
+    "string.min":
+      "Password must be at least 8 characters.",
+
+    "string.max":
+      "Password must not exceed 50 characters.",
+
+    "string.pattern.base":
+      "Password must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number.",
+
+    "any.required":
+      "Password is required.",
+  });
+
+/*
+|--------------------------------------------------------------------------
+| Signup / Registration
+|--------------------------------------------------------------------------
+*/
+const signupSchema = Joi.object({
   full_name: Joi.string()
     .trim()
     .min(3)
     .max(50)
     .required()
     .messages({
-      "string.empty": "Full name is required",
-      "string.min": "Full name must be at least 3 characters",
-      "string.max": "Full name must not exceed 50 characters",
-      "any.required": "Full name is required",
+      "string.empty":
+        "Full name is required.",
+
+      "string.min":
+        "Full name must be at least 3 characters.",
+
+      "string.max":
+        "Full name must not exceed 50 characters.",
+
+      "any.required":
+        "Full name is required.",
     }),
 
   email: Joi.string()
     .trim()
     .lowercase()
-    .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+    .regex(
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    )
     .required()
     .messages({
-      "string.empty": "Email is required",
+      "string.empty":
+        "Email is required.",
+
       "string.pattern.base":
-        "Please enter a valid email address structure (e.g., name@domain.com)",
-      "any.required": "Email is required",
+        "Please enter a valid email address structure (e.g., name@domain.com).",
+
+      "any.required":
+        "Email is required.",
     }),
 
-  password: Joi.string()
-    .min(6)
-    .max(50)
+  password: passwordSchema
     .required()
     .messages({
-      "string.min": "Password must be at least 6 characters",
-      "string.max": "Password must not exceed 50 characters",
-      "any.required": "Password is required",
+      "any.required":
+        "Password is required.",
     }),
 
   city: Joi.string()
     .trim()
     .required()
     .messages({
-      "string.empty": "City directory location is required",
-      "any.required": "City is required",
+      "string.empty":
+        "City is required.",
+
+      "any.required":
+        "City is required.",
     }),
 
   phone_number: Joi.string()
     .trim()
     .required()
     .messages({
-      "string.empty": "Contact phone number is required",
-      "any.required": "Phone number is required",
+      "string.empty":
+        "Phone number is required.",
+
+      "any.required":
+        "Phone number is required.",
     }),
 
   role: Joi.string()
     .valid("STUDENT", "TUTOR")
     .required()
     .messages({
-      "any.only": "Role choice must be either STUDENT or TUTOR",
-      "any.required": "User role is required",
+      "any.only":
+        "Role must be either STUDENT or TUTOR.",
+
+      "any.required":
+        "User role is required.",
     }),
 
-  timezone: Joi.string().optional(),
+  timezone: Joi.string()
+    .trim()
+    .allow("")
+    .optional(),
 });
 
-// ─── LOGIN ───────────────────────────────────────────────────────────────────
-exports.loginSchema = Joi.object({
+/*
+|--------------------------------------------------------------------------
+| Login
+|--------------------------------------------------------------------------
+*/
+const loginSchema = Joi.object({
   email: Joi.string()
     .trim()
     .lowercase()
-    .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+    .regex(
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    )
     .required()
     .messages({
-      "string.empty": "Email is required",
+      "string.empty":
+        "Email is required.",
+
       "string.pattern.base":
-        "Please enter a valid email address structure (e.g., name@domain.com)",
-      "any.required": "Email is required",
+        "Please enter a valid email address structure (e.g., name@domain.com).",
+
+      "any.required":
+        "Email is required.",
     }),
 
-  password: Joi.string()
-    .min(6)
-    .max(50)
-    .pattern(/^(?=(?:.*[A-Z]){1,})(?=(?:.*[a-z]){1,})(?=(?:.*\d){2,}).*$/)
-    .required()
-    .messages({
-      "string.pattern.base":
-        "Password must contain at least 1 uppercase letter, 1 lowercase letter, and 2 numbers",
-    }),
+  password: passwordSchema.required(),
 });
 
-// ─── CHANGE PASSWORD ─────────────────────────────────────────────────────────
-exports.changePasswordSchema = Joi.object({
+/*
+|--------------------------------------------------------------------------
+| Change Password
+|--------------------------------------------------------------------------
+*/
+const changePasswordSchema = Joi.object({
   current_password: Joi.string()
     .required()
     .messages({
-      "any.required": "Current password is required",
+      "string.empty":
+        "Current password is required.",
+
+      "any.required":
+        "Current password is required.",
     }),
 
-  new_password: Joi.string()
-    .min(6)
-    .max(50)
+  new_password: passwordSchema
     .required()
     .messages({
-      "string.min": "New password must be at least 6 characters",
-      "string.max": "New password must not exceed 50 characters",
-      "any.required": "New password is required",
+      "any.required":
+        "New password is required.",
     }),
 
   confirm_password: Joi.string()
-    .valid(Joi.ref("new_password"))
     .required()
+    .valid(Joi.ref("new_password"))
     .messages({
-      "any.only": "Passwords do not match",
-      "any.required": "Password confirmation is required",
+      "string.empty":
+        "Password confirmation is required.",
+
+      "any.only":
+        "Passwords do not match.",
+
+      "any.required":
+        "Password confirmation is required.",
     }),
 }).custom((value, helpers) => {
-  if (value.current_password === value.new_password) {
+  if (
+    value.current_password ===
+    value.new_password
+  ) {
     return helpers.message(
-      "New password must be different from current password"
+      "New password must be different from current password."
     );
   }
 
   return value;
 });
 
-// ─── UPDATE PROFILE ──────────────────────────────────────────────────────────
-exports.updateProfileSchema = Joi.object({
+/*
+|--------------------------------------------------------------------------
+| Update User Profile
+|--------------------------------------------------------------------------
+*/
+const updateProfileSchema = Joi.object({
   full_name: Joi.string()
     .trim()
     .min(3)
     .max(50)
     .optional()
     .messages({
-      "string.min": "Full name must be at least 3 characters",
-      "string.max": "Full name must not exceed 50 characters",
+      "string.min":
+        "Full name must be at least 3 characters.",
+
+      "string.max":
+        "Full name must not exceed 50 characters.",
     }),
 
   email: Joi.string()
     .trim()
     .lowercase()
-    .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+    .regex(
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    )
     .optional()
     .messages({
       "string.pattern.base":
-        "Please enter a valid email address structure (e.g., name@domain.com)",
+        "Please enter a valid email address structure (e.g., name@domain.com).",
     }),
 
   city: Joi.string()
@@ -154,5 +233,20 @@ exports.updateProfileSchema = Joi.object({
     .optional(),
 
   timezone: Joi.string()
+    .trim()
+    .allow("")
     .optional(),
-});
+}).min(1);
+
+/*
+|--------------------------------------------------------------------------
+| Exports
+|--------------------------------------------------------------------------
+*/
+module.exports = {
+  passwordSchema,
+  signupSchema,
+  loginSchema,
+  changePasswordSchema,
+  updateProfileSchema,
+};

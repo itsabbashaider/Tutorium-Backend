@@ -3,12 +3,14 @@ const jwt = require("jsonwebtoken");
 const { User } = require("../models");
 const config = require("../config/env");
 
-const AppError = require("../errors/app.error");
+const { AppError } = require("../errors/app.error");
 const STATUS_CODES = require("../constants/status-codes.constant");
 
 const asyncHandler = require("./async-handler.middleware");
 
 const authenticate = asyncHandler(async (req, res, next) => {
+  console.log("Cookies:", req.cookies);
+
   const token = req.cookies.token;
 
   if (!token) {

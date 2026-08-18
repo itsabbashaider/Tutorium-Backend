@@ -13,7 +13,7 @@ const buildUserFilters = (filters) => {
 };
 
 const buildTutorFilters = (filters) => {
-  const where = {}
+  const where = {};
 
   if (filters.teaching_mode) {
     where.teaching_mode = filters.teaching_mode;
@@ -29,17 +29,18 @@ const buildTutorFilters = (filters) => {
     where.hourly_rate = {};
 
     if (filters.min_price) {
-      where.hourly_rate[Op.gte] = Number(filters.min_price);
+      where.hourly_rate[Op.gte] =
+        Number(filters.min_price);
     }
 
     if (filters.max_price) {
-      where.hourly_rate[Op.lte] = Number(filters.max_price);
+      where.hourly_rate[Op.lte] =
+        Number(filters.max_price);
     }
   }
 
   return where;
-
-}
+};
 
 const buildSubjectFilter = (subject) => {
   if (!subject) {
@@ -76,10 +77,38 @@ const buildSort = (sort_by = "top_rated") => {
   }
 };
 
+const buildUnifiedTutorSearch = (search) => {
+  if (!search?.trim()) {
+    return {};
+  }
+
+  const value = search.trim();
+
+  return {
+    [Op.or]: [
+      {
+        "$user.full_name$": {
+          [Op.iLike]: `%${value}%`,
+        },
+      },
+      {
+        "$user.city$": {
+          [Op.iLike]: `%${value}%`,
+        },
+      },
+      {
+        "$subjects.subject_name$": {
+          [Op.iLike]: `%${value}%`,
+        },
+      },
+    ],
+  };
+};
 
 module.exports = {
   buildUserFilters,
   buildTutorFilters,
   buildSubjectFilter,
   buildSort,
-}
+  buildUnifiedTutorSearch,
+};

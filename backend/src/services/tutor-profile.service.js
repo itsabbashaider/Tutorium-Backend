@@ -24,6 +24,7 @@ const updateProfile = async (user_id, data) => {
     "professional_bio",
     "hourly_rate",
     "teaching_mode",
+    "is_available",
   ]);
 
   if (!hasFields(updateData)) {

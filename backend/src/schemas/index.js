@@ -8,4 +8,5 @@ module.exports = {
   ...require("./tutor-availability.schema"),
   ...require("./student-profile.schema"),
   ...require("./dashboard.schema"),
+  ...require("./user.schema"),
 };

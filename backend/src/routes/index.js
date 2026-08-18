@@ -2,6 +2,8 @@ const express = require("express");
 
 const authRoutes = require("./auth.route");
 
+const userRoutes = require("./user.route");
+
 const tutorSearchRoutes = require("./tutor.route");
 const tutorProfileRoutes = require("./tutor-profile.route");
 const tutorSubjectRoutes = require("./tutor-subject.route");
@@ -19,6 +21,9 @@ const router = express.Router();
 
 // Authentication
 router.use("/auth", authRoutes);
+
+// User
+router.use("/users", userRoutes);
 
 // Tutor
 router.use("/tutors", tutorSearchRoutes);

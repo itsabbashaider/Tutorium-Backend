@@ -14,11 +14,35 @@ const createBookingSchema = Joi.object({
     .required(),
 
   booking_date: Joi.date()
-    .min("now")
     .required()
-    .messages({
-      "date.min":
-        "Booking date must be today or a future date.",
+    .custom((value, helpers) => {
+      const today = new Date();
+
+      today.setHours(
+        0,
+        0,
+        0,
+        0
+      );
+
+      const bookingDate = new Date(
+        value
+      );
+
+      bookingDate.setHours(
+        0,
+        0,
+        0,
+        0
+      );
+
+      if (bookingDate < today) {
+        return helpers.message(
+          "Booking date must be today or a future date."
+        );
+      }
+
+      return value;
     }),
 
   intro_message: Joi.string()
@@ -30,8 +54,19 @@ const createBookingSchema = Joi.object({
 const rejectBookingSchema = Joi.object({
   rejection_reason: Joi.string()
     .trim()
+    .min(1)
     .max(1000)
-    .required(),
+    .required()
+    .messages({
+      "string.empty":
+        "Rejection reason is required.",
+      "string.min":
+        "Rejection reason is required.",
+      "string.max":
+        "Rejection reason must not exceed 1000 characters.",
+      "any.required":
+        "Rejection reason is required.",
+    }),
 });
 
 module.exports = {

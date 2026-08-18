@@ -65,33 +65,24 @@ const getSubjects = async (
   return subjects;
 };
 
-const searchSubjects = async (
-  search,
-  options = {}
-) => {
-
+const searchSubjects = async (search, options = {}) => {
   if (!search?.trim()) {
     return [];
   }
 
-
   const subjects = await Subject.findAll({
     where: {
       subject_name: {
-        [Op.iLike]: `%${search}%`,
+        [Op.iLike]: `${search.trim()}%`,
       },
     },
-    order: [
-      ["subject_name", "ASC"]
-    ],
-
+    order: [["subject_name", "ASC"]],
     limit: 10,
-
-    ...options
-  })
+    ...options,
+  });
 
   return subjects;
-}
+};
 
 module.exports = {
   formatSubject,

@@ -1,13 +1,13 @@
-const express = require('express');
+const express = require("express");
 
-const reviewController = require('../controllers/review.controller');
+const reviewController = require("../controllers/review.controller");
 
-const { 
+const {
   authenticate,
   authorize,
- } = require('../middlewares/auth.middleware');
+} = require("../middlewares/auth.middleware");
 
-const validate = require('../middlewares/validate.middleware');
+const validate = require("../middlewares/validate.middleware");
 
 const {
   createReviewSchema,
@@ -15,33 +15,52 @@ const {
 
 const router = express.Router();
 
-router.use(authenticate);
-
-// Student
-router.post(
-  "/",
-  authorize("STUDENT"),
-  validate(createReviewSchema),
-  reviewController.createReview
-);
-
-// Tutor
-router.get(
-  "/my",
-  authorize("TUTOR"),
-  reviewController.getMyReviews
-);
-
-// Public / Shared
+/*
+|--------------------------------------------------------------------------
+| Public
+|--------------------------------------------------------------------------
+| Anyone can view reviews belonging to a tutor.
+*/
 router.get(
   "/tutor/:tutor_profile_id",
   reviewController.getTutorReviews
 );
 
-router.get(
-  "/:review_id",
-  reviewController.getReviewById
+/*
+|--------------------------------------------------------------------------
+| Student
+|--------------------------------------------------------------------------
+*/
+router.post(
+  "/",
+  authenticate,
+  authorize("STUDENT"),
+  validate(createReviewSchema),
+  reviewController.createReview
 );
 
+/*
+|--------------------------------------------------------------------------
+| Tutor
+|--------------------------------------------------------------------------
+*/
+router.get(
+  "/my",
+  authenticate,
+  authorize("TUTOR"),
+  reviewController.getMyReviews
+);
+
+/*
+|--------------------------------------------------------------------------
+| Shared authenticated route
+|--------------------------------------------------------------------------
+*/
+router.get(
+  "/:review_id",
+  authenticate,
+  authorize("STUDENT", "TUTOR"),
+  reviewController.getReviewById
+);
 
 module.exports = router;

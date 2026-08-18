@@ -7,23 +7,26 @@ const {
   User,
   Subject,
   TutorAvailability,
-} = require('../models');
+} = require("../models");
 
-const { NotFoundError } = require('../errors/app.error');
-const { ForbiddenError } = require('../errors/app.error');
+const {
+  NotFoundError,
+  ForbiddenError,
+} = require("../errors/app.error");
 
 const bookingInclude = [
   {
     model: StudentProfile,
     as: "student",
+
     include: [
       {
         model: User,
         as: "user",
+
         attributes: [
           "user_id",
           "full_name",
-          "email",
           "city",
         ],
       },
@@ -33,14 +36,15 @@ const bookingInclude = [
   {
     model: TutorProfile,
     as: "tutor",
+
     include: [
       {
         model: User,
         as: "user",
+
         attributes: [
           "user_id",
           "full_name",
-          "email",
           "city",
         ],
       },
@@ -50,6 +54,7 @@ const bookingInclude = [
   {
     model: Subject,
     as: "subject",
+
     attributes: [
       "subject_id",
       "subject_name",
@@ -66,7 +71,9 @@ const formatBooking = (booking) => ({
   booking_id: booking.booking_id,
 
   booking_date: booking.booking_date,
+
   booking_start: booking.booking_start,
+
   booking_end: booking.booking_end,
 
   booked_hourly_rate: Number(
@@ -74,20 +81,26 @@ const formatBooking = (booking) => ({
   ),
 
   status: booking.status,
+
   is_completed: booking.is_completed,
 
   meeting_link: booking.meeting_link,
+
   intro_message: booking.intro_message,
 
   cancelled_by: booking.cancelled_by,
+
   cancelled_at: booking.cancelled_at,
 
   rejection_reason: booking.rejection_reason,
 
   subject: booking.subject
     ? {
-        subject_id: booking.subject.subject_id,
-        subject_name: booking.subject.subject_name,
+        subject_id:
+          booking.subject.subject_id,
+
+        subject_name:
+          booking.subject.subject_name,
       }
     : null,
 
@@ -99,10 +112,10 @@ const formatBooking = (booking) => ({
         user: {
           user_id:
             booking.student.user.user_id,
+
           full_name:
             booking.student.user.full_name,
-          email:
-            booking.student.user.email,
+
           city:
             booking.student.user.city,
         },
@@ -117,10 +130,10 @@ const formatBooking = (booking) => ({
         user: {
           user_id:
             booking.tutor.user.user_id,
+
           full_name:
             booking.tutor.user.full_name,
-          email:
-            booking.tutor.user.email,
+
           city:
             booking.tutor.user.city,
         },
@@ -134,16 +147,16 @@ const formatBooking = (booking) => ({
             .availability_slot_id,
 
         day_of_week:
-          booking.availabilitySlot
-            .day_of_week,
+          booking.availabilitySlot.day_of_week,
 
         start_time:
-          booking.availabilitySlot
-            .start_time,
+          booking.availabilitySlot.start_time,
 
         end_time:
-          booking.availabilitySlot
-            .end_time,
+          booking.availabilitySlot.end_time,
+
+        is_active:
+          booking.availabilitySlot.is_active,
       }
     : null,
 });
@@ -198,18 +211,31 @@ const verifyTutorBookingOwner = (
   }
 };
 
-const canAcceptBooking = (booking) =>
-  booking.status === "PENDING";
+const canBookTutor = (tutorProfile) => {
+  return tutorProfile.is_available === true;
+};
 
-const canRejectBooking = (booking) =>
-  booking.status === "PENDING";
+const canBookAvailability = (
+  availability
+) => {
+  return availability.is_active === true;
+};
 
-const canCancelBooking = (booking) =>
-  booking.status === "PENDING";
+const canAcceptBooking = (booking) => {
+  return booking.status === "PENDING";
+};
 
-const canCompleteBooking = (booking) =>
-  booking.status === "ACCEPTED";
+const canRejectBooking = (booking) => {
+  return booking.status === "PENDING";
+};
 
+const canCancelBooking = (booking) => {
+  return booking.status === "PENDING";
+};
+
+const canCompleteBooking = (booking) => {
+  return booking.status === "ACCEPTED";
+};
 
 const getBookings = async (
   where,
@@ -217,8 +243,13 @@ const getBookings = async (
 ) => {
   return Booking.findAndCountAll({
     where,
-    order: [["created_at", "DESC"]],
+
+    order: [
+      ["created_at", "DESC"],
+    ],
+
     ...options,
+
     distinct: true,
   });
 };
@@ -230,6 +261,7 @@ const hasBookingConflict = async (
   const booking = await Booking.findOne({
     where: {
       availability_slot_id,
+
       booking_date,
 
       status: {
@@ -241,20 +273,28 @@ const hasBookingConflict = async (
     },
   });
 
-  return !!booking;
+  return Boolean(booking);
 };
 
 module.exports = {
   bookingInclude,
+
   formatBooking,
-  findBooking,
   formatBookingList,
+
+  findBooking,
+
   verifyStudentBookingOwner,
   verifyTutorBookingOwner,
+
+  canBookTutor,
+  canBookAvailability,
+
   canAcceptBooking,
   canRejectBooking,
   canCancelBooking,
   canCompleteBooking,
+
   getBookings,
   hasBookingConflict,
-}
+};

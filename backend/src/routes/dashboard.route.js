@@ -5,13 +5,11 @@ const {
   authorize,
 } = require("../middlewares/auth.middleware");
 
-
-
 const dashboardController = require("../controllers/dashboard.controller");
 
 const USER_ROLES = require("../constants/user-roles.constant");
 
-
+const asyncHandler = require("../middlewares/async-handler.middleware");
 
 const router = express.Router();
 
@@ -19,24 +17,24 @@ router.get(
   "/student/me",
   authenticate,
   authorize(USER_ROLES.STUDENT),
-  dashboardController.getMyStudentDashboard
+  asyncHandler(dashboardController.getMyStudentDashboard)
 );
 
 router.get(
   "/student/:student_profile_id",
-  dashboardController.getStudentDashboard
+  asyncHandler(dashboardController.getStudentDashboard)
 );
 
 router.get(
   "/tutor/me",
   authenticate,
   authorize(USER_ROLES.TUTOR),
-  dashboardController.getMyTutorDashboard
+  asyncHandler(dashboardController.getMyTutorDashboard)
 );
 
 router.get(
   "/tutor/:tutor_profile_id",
-  dashboardController.getTutorDashboard
+  asyncHandler(dashboardController.getTutorDashboard)
 );
 
 module.exports = router;
