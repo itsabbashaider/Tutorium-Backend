@@ -1,7 +1,5 @@
 'use strict';
 
-const { defaultValueSchemable } = require("sequelize/lib/utils");
-
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('tutor_profiles', {
@@ -32,9 +30,13 @@ module.exports = {
         defaultValue: 0,
       },
       teaching_mode: {
-        type: Sequelize.ENUM('ONLINE', 'IN_PERSON', 'BOTH'),
+        type: Sequelize.ENUM(
+          'ONLINE',
+          'IN_PERSON',
+          'BOTH'
+        ),
         allowNull: false,
-        defaultValue: "online",
+        defaultValue: 'ONLINE',
       },
       is_available: {
         type: Sequelize.BOOLEAN,
