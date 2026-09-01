@@ -2,6 +2,7 @@ const {
   Booking,
   Review,
   StudentProfile,
+  TutorProfile,
   User,
   Subject,
 } = require("../models");
@@ -13,11 +14,13 @@ const reviewInclude = [
   {
     model: Booking,
     as: "booking",
+
     include: [
       {
         model: StudentProfile,
         as: "student",
         attributes: ["student_profile_id"],
+
         include: [
           {
             model: User,
@@ -26,6 +29,21 @@ const reviewInclude = [
           },
         ],
       },
+
+      {
+        model: TutorProfile,
+        as: "tutor",
+        attributes: ["tutor_profile_id"],
+
+        include: [
+          {
+            model: User,
+            as: "user",
+            attributes: ["user_id", "full_name"],
+          },
+        ],
+      },
+
       {
         model: Subject,
         as: "subject",
@@ -49,7 +67,8 @@ const formatReview = (review) => ({
 
   booking: review.booking
     ? {
-        booking_id: review.booking.booking_id,
+        booking_id:
+          review.booking.booking_id,
 
         booking_date:
           review.booking.booking_date,
@@ -60,7 +79,8 @@ const formatReview = (review) => ({
         booking_end:
           review.booking.booking_end,
 
-        status: review.booking.status,
+        status:
+          review.booking.status,
 
         student: review.booking.student
           ? {
@@ -74,13 +94,27 @@ const formatReview = (review) => ({
             }
           : null,
 
+        tutor: review.booking.tutor
+          ? {
+              tutor_profile_id:
+                review.booking.tutor
+                  .tutor_profile_id,
+
+              full_name:
+                review.booking.tutor.user
+                  ?.full_name || "Tutor",
+            }
+          : null,
+
         subject: review.booking.subject
           ? {
               subject_id:
-                review.booking.subject.subject_id,
+                review.booking.subject
+                  .subject_id,
 
               subject_name:
-                review.booking.subject.subject_name,
+                review.booking.subject
+                  .subject_name,
             }
           : null,
       }
@@ -131,6 +165,7 @@ const getTutorReviews = async (
     include: [
       {
         ...reviewInclude[0],
+
         where: {
           tutor_profile_id,
         },

@@ -1,9 +1,17 @@
 const {
   fn,
   col,
+  literal,
 } = require("sequelize");
 
-const { TutorProfile, User, Subject, Review, Booking } = require("../models");
+const {
+  TutorProfile,
+  User,
+  Subject,
+  Review,
+  Booking,
+  TutorAvailability,
+} = require("../models");
 
 const { NotFoundError } = require("../errors/app.error");
 
@@ -94,6 +102,26 @@ const tutorSearchInclude = [
 
 /*
 |--------------------------------------------------------------------------
+| Safe accessor for ad hoc computed fields
+|--------------------------------------------------------------------------
+| available_slot_count / is_bookable are not declared attributes on the
+| TutorProfile model — they're attached at query/runtime time (via a raw
+| SQL literal() alias in findTutors, or via setDataValue() in
+| findTutorById). Sequelize only wires up a plain-property getter for
+| attributes declared at Model.init() time, so `tutor.available_slot_count`
+| reads as undefined even though the value is really sitting in
+| `dataValues`. Reading through `.get()` always reflects dataValues,
+| regardless of whether the attribute was declared, so use that instead of
+| dot access. Falls back to plain dot access for already-plain objects.
+*/
+const getComputedField = (record, key) => {
+  return typeof record?.get === "function"
+    ? record.get(key)
+    : record?.[key];
+};
+
+/*
+|--------------------------------------------------------------------------
 | Private tutor profile formatter
 |--------------------------------------------------------------------------
 */
@@ -155,28 +183,53 @@ const formatTutorPublicProfile = (profile) => {
   return {
     tutor_profile_id: profile.tutor_profile_id,
 
-    full_name: profile.user?.full_name || null,
+    full_name:
+      profile.user?.full_name || null,
 
-    city: profile.user?.city || null,
+    city:
+      profile.user?.city || null,
 
-    professional_bio: profile.professional_bio,
+    professional_bio:
+      profile.professional_bio,
 
-    hourly_rate: Number(profile.hourly_rate),
+    hourly_rate:
+      Number(profile.hourly_rate),
 
-    teaching_mode: profile.teaching_mode,
+    teaching_mode:
+      profile.teaching_mode,
 
-    is_available: profile.is_available,
+    is_available:
+      profile.is_available,
 
-    avg_rating: Number(profile.avg_rating),
+    is_bookable:
+      Boolean(
+        getComputedField(profile, "is_bookable")
+      ),
 
-    total_completed_sessions: profile.total_completed_sessions,
+    available_slot_count:
+      Number(
+        getComputedField(
+          profile,
+          "available_slot_count"
+        ) ?? 0
+      ),
+
+    avg_rating:
+      Number(profile.avg_rating),
+
+    total_completed_sessions:
+      profile.total_completed_sessions,
 
     subjects: profile.subjects
-      ? profile.subjects.map((subject) => ({
-          subject_id: subject.subject_id,
+      ? profile.subjects.map(
+          (subject) => ({
+            subject_id:
+              subject.subject_id,
 
-          subject_name: subject.subject_name,
-        }))
+            subject_name:
+              subject.subject_name,
+          })
+        )
       : [],
   };
 };
@@ -187,25 +240,55 @@ const formatTutorPublicProfile = (profile) => {
 |--------------------------------------------------------------------------
 */
 const formatTutor = (tutor) => ({
-  tutor_profile_id: tutor.tutor_profile_id,
+  tutor_profile_id:
+    tutor.tutor_profile_id,
 
-  full_name: tutor.user.full_name,
+  full_name:
+    tutor.user?.full_name || null,
 
-  city: tutor.user.city,
+  city:
+    tutor.user?.city || null,
 
-  professional_bio: tutor.professional_bio,
+  professional_bio:
+    tutor.professional_bio,
 
-  hourly_rate: Number(tutor.hourly_rate),
+  hourly_rate:
+    Number(tutor.hourly_rate),
 
-  teaching_mode: tutor.teaching_mode,
+  teaching_mode:
+    tutor.teaching_mode,
 
-  avg_rating: Number(tutor.avg_rating),
+  is_available:
+    tutor.is_available,
 
-  subjects: tutor.subjects.map((subject) => ({
-    subject_id: subject.subject_id,
+  is_bookable:
+    Boolean(
+      getComputedField(tutor, "is_bookable")
+    ),
 
-    subject_name: subject.subject_name,
-  })),
+  available_slot_count:
+    Number(
+      getComputedField(
+        tutor,
+        "available_slot_count"
+      ) ?? 0
+    ),
+
+  avg_rating:
+    Number(tutor.avg_rating),
+
+  subjects:
+    tutor.subjects
+      ? tutor.subjects.map(
+          (subject) => ({
+            subject_id:
+              subject.subject_id,
+
+            subject_name:
+              subject.subject_name,
+          })
+        )
+      : [],
 });
 
 const formatTutorList = (tutors) => {
@@ -243,14 +326,43 @@ const findTutorProfileById = async (tutor_profile_id) => {
   return tutorProfile;
 };
 
-const findTutorById = async (tutor_profile_id, options = {}) => {
-  const tutor = await TutorProfile.findByPk(tutor_profile_id, {
-    ...options,
-  });
+const findTutorById = async (
+  tutor_profile_id,
+  options = {}
+) => {
+  const tutor =
+    await TutorProfile.findByPk(
+      tutor_profile_id,
+      options
+    );
 
   if (!tutor) {
-    throw new NotFoundError("Tutor not found.");
+    throw new NotFoundError(
+      "Tutor not found."
+    );
   }
+
+  const activeSlotCount =
+    await TutorAvailability.count({
+      where: {
+        tutor_profile_id,
+        is_active: true,
+      },
+    });
+
+  tutor.setDataValue(
+    "available_slot_count",
+    activeSlotCount
+  );
+
+  tutor.setDataValue(
+    "is_bookable",
+    Boolean(
+      tutor.is_available &&
+      activeSlotCount > 0
+    )
+  );
+  
 
   return tutor;
 };
@@ -317,8 +429,37 @@ const updateTutorRatingStats = async (
 
 const findTutors = async (options = {}) => {
   return TutorProfile.findAndCountAll({
+    attributes: {
+      include: [
+        [
+          literal(`(
+            SELECT COUNT(*)
+            FROM tutor_availability AS availability
+            WHERE availability.tutor_profile_id = "TutorProfile"."tutor_profile_id"
+              AND availability.is_active = true
+          )`),
+          "available_slot_count",
+        ],
+
+        [
+          literal(`(
+            "TutorProfile"."is_available" = true
+            AND EXISTS (
+              SELECT 1
+              FROM tutor_availability AS availability
+              WHERE availability.tutor_profile_id = "TutorProfile"."tutor_profile_id"
+                AND availability.is_active = true
+            )
+          )`),
+          "is_bookable",
+        ],
+      ],
+    },
+
     include: tutorSearchInclude,
+
     distinct: true,
+
     ...options,
   });
 };

@@ -19,7 +19,6 @@ const router = express.Router();
 |--------------------------------------------------------------------------
 | Public
 |--------------------------------------------------------------------------
-| Anyone can view reviews belonging to a tutor.
 */
 router.get(
   "/tutor/:tutor_profile_id",
@@ -47,9 +46,10 @@ router.post(
 router.get(
   "/my",
   authenticate,
-  authorize("TUTOR"),
+  authorize("STUDENT", "TUTOR"),
   reviewController.getMyReviews
 );
+
 
 /*
 |--------------------------------------------------------------------------

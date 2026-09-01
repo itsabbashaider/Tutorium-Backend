@@ -205,9 +205,16 @@ const getStudentBookings = async (user_id, query) => {
   );
 
   return {
-    bookings: formatBookingList(rows),
+    bookings: formatBookingList(
+      rows,
+      "STUDENT"
+    ),
 
-    pagination: getPaginationMeta(count, page, limit),
+    pagination: getPaginationMeta(
+      count,
+      page,
+      limit
+    ),
   };
 };
 
@@ -230,9 +237,16 @@ const getTutorBookings = async (user_id, query) => {
   );
 
   return {
-    bookings: formatBookingList(rows),
+    bookings: formatBookingList(
+      rows,
+      "TUTOR"
+    ),
 
-    pagination: getPaginationMeta(count, page, limit),
+    pagination: getPaginationMeta(
+      count,
+      page,
+      limit
+    ),
   };
 };
 
@@ -251,7 +265,10 @@ const getBookingById = async (user_id, role, booking_id) => {
     verifyTutorBookingOwner(tutorProfile, booking);
   }
 
-  return formatBooking(booking);
+  return formatBooking(
+    booking,
+    role
+  );
 };
 
 const acceptBooking = async (user_id, booking_id) => {
@@ -332,11 +349,7 @@ const completeBooking = async (user_id, booking_id) => {
   if (!canCompleteBooking(booking)) {
     throw new BadRequestError("This booking cannot be completed.");
   }
-  if (!hasBookingEnded(booking.booking_end)) {
-    throw new BadRequestError(
-      "This booking cannot be completed before the session has ended.",
-    );
-  }
+
 
   await booking.update({
     status: "COMPLETED",

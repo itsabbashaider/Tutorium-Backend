@@ -36,6 +36,39 @@ const formatStudentProfile = (profile) => ({
   },
 });
 
+const formatStudentPublicProfile = (
+  studentProfile,
+  completionRate = 0
+) => {
+  return {
+    student_profile_id:
+      studentProfile.student_profile_id,
+
+    academic_level:
+      studentProfile.academic_level,
+
+    learning_goals:
+      studentProfile.learning_goals,
+
+    completion_rate: Number(
+      completionRate.toFixed(1)
+    ),
+
+    user: studentProfile.user
+      ? {
+          user_id:
+            studentProfile.user.user_id,
+
+          full_name:
+            studentProfile.user.full_name,
+
+          city:
+            studentProfile.user.city,
+        }
+      : null,
+  };
+};;
+
 const findStudentProfile = async (
   user_id,
   options = {}
@@ -80,6 +113,7 @@ const findStudentProfileById = async (
 module.exports = {
   studentProfileInclude,
   formatStudentProfile,
+  formatStudentPublicProfile,
   findStudentProfile,
   findStudentProfileById
 };

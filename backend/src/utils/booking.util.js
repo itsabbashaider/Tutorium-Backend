@@ -2,6 +2,7 @@ const { Op } = require("sequelize");
 
 const {
   Booking,
+  Review,
   StudentProfile,
   TutorProfile,
   User,
@@ -65,104 +66,200 @@ const bookingInclude = [
     model: TutorAvailability,
     as: "availabilitySlot",
   },
+
+  {
+    model: Review,
+    as: "review",
+    attributes: ["review_id"],
+    required: false,
+  },
 ];
 
-const formatBooking = (booking) => ({
-  booking_id: booking.booking_id,
+const formatBooking = (
+  booking,
+  role = null
+) => ({
+  booking_id:
+    booking.booking_id,
 
-  booking_date: booking.booking_date,
+  booking_date:
+    booking.booking_date,
 
-  booking_start: booking.booking_start,
+  booking_start:
+    booking.booking_start,
 
-  booking_end: booking.booking_end,
+  booking_end:
+    booking.booking_end,
 
-  booked_hourly_rate: Number(
-    booking.booked_hourly_rate
-  ),
+  booked_hourly_rate:
+    Number(
+      booking.booked_hourly_rate
+    ),
 
-  status: booking.status,
+  status:
+    booking.status,
 
-  is_completed: booking.is_completed,
+  is_completed:
+    booking.is_completed,
 
-  meeting_link: booking.meeting_link,
+  meeting_link:
+    booking.meeting_link,
 
-  intro_message: booking.intro_message,
+  intro_message:
+    booking.intro_message,
 
-  cancelled_by: booking.cancelled_by,
+  cancelled_by:
+    booking.cancelled_by,
 
-  cancelled_at: booking.cancelled_at,
+  cancelled_at:
+    booking.cancelled_at,
 
-  rejection_reason: booking.rejection_reason,
+  rejection_reason:
+    booking.rejection_reason,
 
-  subject: booking.subject
-    ? {
-        subject_id:
-          booking.subject.subject_id,
+  review:
+    booking.review
+      ? {
+          review_id:
+            booking.review
+              .review_id,
+        }
+      : null,
 
-        subject_name:
-          booking.subject.subject_name,
-      }
-    : null,
+  available_actions:
+    role === "STUDENT"
+      ? {
+          can_cancel:
+            canCancelBooking(
+              booking
+            ),
 
-  student: booking.student
-    ? {
-        student_profile_id:
-          booking.student.student_profile_id,
+          can_review:
+            booking.status ===
+              "COMPLETED" &&
+            !booking.review,
+        }
+      : role === "TUTOR"
+        ? {
+            can_accept:
+              canAcceptBooking(
+                booking
+              ),
 
-        user: {
-          user_id:
-            booking.student.user.user_id,
+            can_reject:
+              canRejectBooking(
+                booking
+              ),
 
-          full_name:
-            booking.student.user.full_name,
+            can_complete:
+              canCompleteBooking(
+                booking
+              ),
+          }
+        : {
+            can_cancel: false,
+            can_review: false,
+            can_accept: false,
+            can_reject: false,
+            can_complete: false,
+          },
 
-          city:
-            booking.student.user.city,
-        },
-      }
-    : null,
+  subject:
+    booking.subject
+      ? {
+          subject_id:
+            booking.subject
+              .subject_id,
 
-  tutor: booking.tutor
-    ? {
-        tutor_profile_id:
-          booking.tutor.tutor_profile_id,
+          subject_name:
+            booking.subject
+              .subject_name,
+        }
+      : null,
 
-        user: {
-          user_id:
-            booking.tutor.user.user_id,
+  student:
+    booking.student
+      ? {
+          student_profile_id:
+            booking.student
+              .student_profile_id,
 
-          full_name:
-            booking.tutor.user.full_name,
+          user: {
+            user_id:
+              booking.student.user
+                .user_id,
 
-          city:
-            booking.tutor.user.city,
-        },
-      }
-    : null,
+            full_name:
+              booking.student.user
+                .full_name,
 
-  availability: booking.availabilitySlot
-    ? {
-        availability_slot_id:
-          booking.availabilitySlot
-            .availability_slot_id,
+            city:
+              booking.student.user
+                .city,
+          },
+        }
+      : null,
 
-        day_of_week:
-          booking.availabilitySlot.day_of_week,
+  tutor:
+    booking.tutor
+      ? {
+          tutor_profile_id:
+            booking.tutor
+              .tutor_profile_id,
 
-        start_time:
-          booking.availabilitySlot.start_time,
+          user: {
+            user_id:
+              booking.tutor.user
+                .user_id,
 
-        end_time:
-          booking.availabilitySlot.end_time,
+            full_name:
+              booking.tutor.user
+                .full_name,
 
-        is_active:
-          booking.availabilitySlot.is_active,
-      }
-    : null,
+            city:
+              booking.tutor.user
+                .city,
+          },
+        }
+      : null,
+
+  availability:
+    booking.availabilitySlot
+      ? {
+          availability_slot_id:
+            booking.availabilitySlot
+              .availability_slot_id,
+
+          day_of_week:
+            booking.availabilitySlot
+              .day_of_week,
+
+          start_time:
+            booking.availabilitySlot
+              .start_time,
+
+          end_time:
+            booking.availabilitySlot
+              .end_time,
+
+          is_active:
+            booking.availabilitySlot
+              .is_active,
+        }
+      : null,
 });
 
-const formatBookingList = (bookings) => {
-  return bookings.map(formatBooking);
+const formatBookingList = (
+  bookings,
+  role
+) => {
+  return bookings.map(
+    (booking) =>
+      formatBooking(
+        booking,
+        role
+      )
+  );
 };
 
 const findBooking = async (

@@ -33,7 +33,7 @@ router.use("/bookings", bookingRoutes);
 router.use("/tutor/availability", tutorAvailabilityRoutes);
 
 // Student
-router.use("/student/profile", studentProfileRoutes);
+router.use("/student", studentProfileRoutes);
 
 // Reviews
 router.use("/reviews", reviewRoutes);

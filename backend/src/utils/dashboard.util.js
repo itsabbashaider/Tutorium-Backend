@@ -1,6 +1,7 @@
 const {
   Booking,
   Review,
+  TutorAvailability,
 } = require("../models");
 
 const {
@@ -44,6 +45,22 @@ const getBookingStats = async (
     stats[booking.status] =
       Number(booking.count);
   });
+  const finalizedBookings =
+    stats.REJECTED +
+    stats.COMPLETED +
+    stats.CANCELLED;
+
+  const completionRate =
+    finalizedBookings > 0
+      ? Number(
+          (
+            (stats.COMPLETED /
+              finalizedBookings) *
+            100
+          ).toFixed(2)
+        )
+      : 0;
+
   return {
     totalBookings,
 
@@ -52,6 +69,9 @@ const getBookingStats = async (
     rejectedBookings: stats.REJECTED,
     completedBookings: stats.COMPLETED,
     cancelledBookings: stats.CANCELLED,
+
+    finalizedBookings,
+    completionRate,
   };
 };
 
@@ -65,6 +85,22 @@ const getReviewStats = async (
 
   return {
     totalReviews,
+  };
+};
+
+const getAvailabilityStats = async (
+  tutor_profile_id
+) => {
+  const activeSlots =
+    await TutorAvailability.count({
+      where: {
+        tutor_profile_id,
+        is_active: true,
+      },
+    });
+
+  return {
+    activeSlots,
   };
 };
 
@@ -105,7 +141,7 @@ const buildTutorDashboard = async (
         tutorProfile.tutor_profile_id,
     });
 
-  const reviewStats = 
+  const reviewStats =
     await getReviewStats([
       {
         model: Booking,
@@ -118,9 +154,15 @@ const buildTutorDashboard = async (
       },
     ]);
 
+  const availabilityStats =
+    await getAvailabilityStats(
+      tutorProfile.tutor_profile_id
+    );
+
   return {
     bookingStats,
     reviewStats,
+    availabilityStats,
   };
 };
 
@@ -168,6 +210,12 @@ const formatStudentPrivateDashboard = (
 
       cancelled_bookings:
         dashboard.bookingStats.cancelledBookings,
+
+      finalized_bookings:
+        dashboard.bookingStats.finalizedBookings,
+
+      completion_rate:
+        dashboard.bookingStats.completionRate,
     },
   };
 };
@@ -231,6 +279,12 @@ const formatTutorPrivateDashboard = (
       cancelled_bookings:
         dashboard.bookingStats.cancelledBookings,
     },
+
+    availability_stats: {
+      active_slots:
+        dashboard.availabilityStats
+          .activeSlots,
+    },
   };
 };
 
@@ -238,6 +292,7 @@ const formatTutorPrivateDashboard = (
 module.exports = {
   getBookingStats,
   getReviewStats,
+  getAvailabilityStats,
 
   buildStudentDashboard,
   buildTutorDashboard,  

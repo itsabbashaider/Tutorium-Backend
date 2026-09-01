@@ -1,14 +1,21 @@
 const {
   studentProfileInclude,
   formatStudentProfile,
+  formatPublicStudentProfile,
+  formatStudentPublicProfile,
   findStudentProfile,
-} = require('../utils/student-profile.util');
+  findStudentProfileById,
+} = require("../utils/student-profile.util");
 
 const {
   pickFields,
   hasFields,
-} = require('../utils/object.util');
+} = require("../utils/object.util");
 
+const {
+  User,
+  Booking,
+} = require("../models")
 
 const getProfile = async (user_id) => {
   const studentProfile = await findStudentProfile(user_id, {
@@ -18,6 +25,71 @@ const getProfile = async (user_id) => {
   return formatStudentProfile(studentProfile);
 };
 
+const getStudentPublicProfile = async (
+  student_profile_id
+) => {
+  const studentProfile =
+    await findStudentProfileById(
+      student_profile_id,
+      {
+        include: [
+          {
+            model: User,
+            as: "user",
+            attributes: [
+              "user_id",
+              "full_name",
+              "city",
+            ],
+          },
+        ],
+      }
+    );
+
+  const totalCompleted =
+    await Booking.count({
+      where: {
+        student_profile_id,
+
+        status: "COMPLETED",
+      },
+    });
+
+  const totalCancelled =
+    await Booking.count({
+      where: {
+        student_profile_id,
+
+        status: "CANCELLED",
+      },
+    });
+
+  const totalRejected =
+    await Booking.count({
+      where: {
+        student_profile_id,
+
+        status: "REJECTED",
+      },
+    });
+
+  const finalizedBookings =
+    totalCompleted +
+    totalCancelled +
+    totalRejected;
+
+  const completionRate =
+    finalizedBookings === 0
+      ? 0
+      : (totalCompleted /
+          finalizedBookings) *
+        100;
+
+  return formatStudentPublicProfile(
+    studentProfile,
+    completionRate
+  );
+};
 
 const updateProfile = async (user_id, data) => {
   const studentProfile = await findStudentProfile(user_id, {
@@ -40,5 +112,6 @@ const updateProfile = async (user_id, data) => {
 
 module.exports = {
   getProfile,
+  getStudentPublicProfile,
   updateProfile,
-}
+};
