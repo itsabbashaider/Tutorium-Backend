@@ -48,7 +48,9 @@ const createBookingSchema = Joi.object({
   intro_message: Joi.string()
     .trim()
     .max(500)
+    .allow("")
     .optional(),
+
 });
 
 const rejectBookingSchema = Joi.object({

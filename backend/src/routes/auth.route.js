@@ -11,7 +11,6 @@ const {
         loginSchema
       } = require('../schemas/auth.schema');
 
-
 const router = express.Router();
 
 router.post(
@@ -24,6 +23,16 @@ router.post(
   '/login',
   validateRequest(loginSchema),
   AsyncHandler(authController.login)
+);
+
+router.get(
+  '/google',
+  AsyncHandler(authController.googleRedirect)
+);
+
+router.get(
+  '/google/callback',
+  AsyncHandler(authController.googleCallback)
 );
 
 router.post(

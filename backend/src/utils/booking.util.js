@@ -29,6 +29,7 @@ const bookingInclude = [
           "user_id",
           "full_name",
           "city",
+          "avatar_url",
         ],
       },
     ],
@@ -47,6 +48,7 @@ const bookingInclude = [
           "user_id",
           "full_name",
           "city",
+          "avatar_url",
         ],
       },
     ],
@@ -196,6 +198,8 @@ const formatBooking = (
             city:
               booking.student.user
                 .city,
+            avatar_url:
+            booking.student.user.avatar_url || null,
           },
         }
       : null,
@@ -219,6 +223,8 @@ const formatBooking = (
             city:
               booking.tutor.user
                 .city,
+            avatar_url:
+              booking.tutor.user.avatar_url || null,
           },
         }
       : null,

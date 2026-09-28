@@ -40,6 +40,7 @@ const getStudentPublicProfile = async (
               "user_id",
               "full_name",
               "city",
+              "avatar_url"
             ],
           },
         ],

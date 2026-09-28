@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     password: {
       type: DataTypes.STRING(255),
-      allowNull: false
+      allowNull: true
     },
     city: {
       type: DataTypes.STRING,
@@ -37,12 +37,17 @@ module.exports = (sequelize, DataTypes) => {
     },
     role: {
       type: DataTypes.ENUM('STUDENT', 'TUTOR'),
-      allowNull: false
+      allowNull: true
     },
     timezone: {
       type: DataTypes.STRING,
       allowNull: true
-    }
+    },
+    avatar_url: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: null,
+    },
   }, {
     tableName: 'users',
     timestamps: true,

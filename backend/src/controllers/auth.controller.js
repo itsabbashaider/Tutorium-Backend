@@ -7,8 +7,6 @@ const asyncHandler = require("../middlewares/async-handler.middleware");
 const { getCookieOptions } = require("../utils/cookie.util");
 
 const register = asyncHandler(async (req, res) => {
-  console.log(req.body);
-  
   const user = await authService.register(req.body);
 
   return res.status(STATUS_CODES.CREATED).json({
@@ -28,6 +26,38 @@ const login = asyncHandler(async (req, res) => {
     message: "Login successful.",
     data: user,
   });
+});
+
+const googleRedirect = asyncHandler(async (req, res) => {
+  const rootUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
+
+  const options = {
+    redirect_uri: process.env.GOOGLE_CALLBACK_URL,
+    client_id: process.env.GOOGLE_CLIENT_ID,
+    access_type: 'offline',
+    response_type: 'code',
+    prompt: 'consent',
+    scope: [
+      'https://www.googleapis.com/auth/userinfo.profile',
+      'https://www.googleapis.com/auth/userinfo.email',
+    ].join(' '),
+  };
+
+  const qs = new URLSearchParams(options);
+  return res.redirect(`${rootUrl}?${qs.toString()}`);
+});
+
+const googleCallback = asyncHandler(async (req, res) => {
+  const code = req.query.code;
+  if (!code) {
+    return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: 'Authorization code not provided.' });
+  }
+
+  const { token, user, isNewUser } = await authService.googleAuth(code);
+
+  res.cookie("token", token, getCookieOptions());
+
+  return res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
 });
 
 const logout = asyncHandler(async (req, res) => {
@@ -53,6 +83,8 @@ const getMe = asyncHandler(async (req, res) => {
 module.exports = {
   register,
   login,
+  googleRedirect,
+  googleCallback,
   logout,
   getMe,
 };

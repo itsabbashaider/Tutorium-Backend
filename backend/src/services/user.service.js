@@ -33,7 +33,20 @@ const updateProfile = async (user_id, data) => {
   return getUserResponse(user);
 };
 
+const updateAvatar = async (user_id, avatar_url) => {
+  const user = await User.findByPk(user_id);
+
+  if (!user) {
+    throw new NotFoundError("User not found.");
+  }
+
+  await user.update({ avatar_url });
+
+  return getUserResponse(user);
+};
+
 module.exports = {
   getProfile,
   updateProfile,
+  updateAvatar,
 };

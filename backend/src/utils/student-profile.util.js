@@ -16,6 +16,7 @@ const studentProfileInclude = [
       "city",
       "phone_number",
       "timezone",
+      "avatar_url",
     ],
   },
 ];
@@ -31,6 +32,7 @@ const formatStudentProfile = (profile) => ({
     full_name: profile.user.full_name,
     email: profile.user.email,
     city: profile.user.city,
+    avatar_url: profile.user?.avatar_url || null,
     phone_number: profile.user.phone_number,
     timezone: profile.user.timezone,
   },
@@ -61,6 +63,9 @@ const formatStudentPublicProfile = (
 
           full_name:
             studentProfile.user.full_name,
+
+          avatar_url:
+            studentProfile.user?.avatar_url || null,
 
           city:
             studentProfile.user.city,

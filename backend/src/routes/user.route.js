@@ -4,6 +4,7 @@ const userController = require("../controllers/user.controller");
 
 const { authenticate } = require("../middlewares/auth.middleware");
 const validateRequest = require("../middlewares/validate.middleware");
+const { uploadAvatar } = require("../middlewares/upload.middleware");
 
 const {
   updateUserProfileSchema,
@@ -22,6 +23,13 @@ router.patch(
   authenticate,
   validateRequest(updateUserProfileSchema),
   userController.updateProfile
+);
+
+router.patch(
+  "/avatar",
+  authenticate,
+  uploadAvatar.single("avatar"),
+  userController.updateAvatar
 );
 
 module.exports = router;

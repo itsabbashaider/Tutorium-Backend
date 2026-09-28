@@ -8,6 +8,7 @@ const getUserResponse = (user) => {
     city: user.city,
     phone_number: user.phone_number,
     role: user.role,
+    avatar_url: user.avatar_url,
     timezone: user.timezone,
     created_at: user.created_at,
     updated_at: user.updated_at,

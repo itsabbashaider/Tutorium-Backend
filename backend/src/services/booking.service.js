@@ -350,6 +350,9 @@ const completeBooking = async (user_id, booking_id) => {
     throw new BadRequestError("This booking cannot be completed.");
   }
 
+  if (new Date() < new Date(booking.booking_end)) {
+    throw new BadRequestError("Cannot complete a booking before its session time has ended.");
+  }
 
   await booking.update({
     status: "COMPLETED",
