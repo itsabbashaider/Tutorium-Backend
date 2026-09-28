@@ -1,8 +1,4 @@
-const {
-  fn,
-  col,
-  literal,
-} = require("sequelize");
+const { fn, col, literal } = require("sequelize");
 
 const {
   TutorProfile,
@@ -72,9 +68,7 @@ const tutorSearchInclude = [
 ];
 
 const getComputedField = (record, key) => {
-  return typeof record?.get === "function"
-    ? record.get(key)
-    : record?.[key];
+  return typeof record?.get === "function" ? record.get(key) : record?.[key];
 };
 
 const formatTutorProfile = (profile) => {
@@ -117,11 +111,9 @@ const formatTutorPublicProfile = (profile) => {
     hourly_rate: Number(profile.hourly_rate),
     teaching_mode: profile.teaching_mode,
     is_available: profile.is_available,
-    is_bookable: Boolean(
-      getComputedField(profile, "is_bookable")
-    ),
+    is_bookable: Boolean(getComputedField(profile, "is_bookable")),
     available_slot_count: Number(
-      getComputedField(profile, "available_slot_count") ?? 0
+      getComputedField(profile, "available_slot_count") ?? 0,
     ),
     avg_rating: Number(profile.avg_rating),
     total_completed_sessions: profile.total_completed_sessions,
@@ -143,11 +135,9 @@ const formatTutor = (tutor) => ({
   hourly_rate: Number(tutor.hourly_rate),
   teaching_mode: tutor.teaching_mode,
   is_available: tutor.is_available,
-  is_bookable: Boolean(
-    getComputedField(tutor, "is_bookable")
-  ),
+  is_bookable: Boolean(getComputedField(tutor, "is_bookable")),
   available_slot_count: Number(
-    getComputedField(tutor, "available_slot_count") ?? 0
+    getComputedField(tutor, "available_slot_count") ?? 0,
   ),
   avg_rating: Number(tutor.avg_rating),
   subjects: tutor.subjects
@@ -208,7 +198,7 @@ const findTutorById = async (tutor_profile_id, options = {}) => {
 
   tutor.setDataValue(
     "is_bookable",
-    Boolean(tutor.is_available && activeSlotCount > 0)
+    Boolean(tutor.is_available && activeSlotCount > 0),
   );
 
   return tutor;

@@ -29,18 +29,18 @@ const login = asyncHandler(async (req, res) => {
 });
 
 const googleRedirect = asyncHandler(async (req, res) => {
-  const rootUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
+  const rootUrl = "https://accounts.google.com/o/oauth2/v2/auth";
 
   const options = {
     redirect_uri: process.env.GOOGLE_CALLBACK_URL,
     client_id: process.env.GOOGLE_CLIENT_ID,
-    access_type: 'offline',
-    response_type: 'code',
-    prompt: 'consent',
+    access_type: "offline",
+    response_type: "code",
+    prompt: "consent",
     scope: [
-      'https://www.googleapis.com/auth/userinfo.profile',
-      'https://www.googleapis.com/auth/userinfo.email',
-    ].join(' '),
+      "https://www.googleapis.com/auth/userinfo.profile",
+      "https://www.googleapis.com/auth/userinfo.email",
+    ].join(" "),
   };
 
   const qs = new URLSearchParams(options);
@@ -50,7 +50,9 @@ const googleRedirect = asyncHandler(async (req, res) => {
 const googleCallback = asyncHandler(async (req, res) => {
   const code = req.query.code;
   if (!code) {
-    return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: 'Authorization code not provided.' });
+    return res
+      .status(STATUS_CODES.BAD_REQUEST)
+      .json({ success: false, message: "Authorization code not provided." });
   }
 
   const { token, user, isNewUser } = await authService.googleAuth(code);

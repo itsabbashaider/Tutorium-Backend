@@ -1,7 +1,4 @@
-const {
-  StudentProfile,
-  User,
-} = require("../models");
+const { StudentProfile, User } = require("../models");
 
 const { NotFoundError } = require("../errors/app.error");
 
@@ -38,87 +35,62 @@ const formatStudentProfile = (profile) => ({
   },
 });
 
-const formatStudentPublicProfile = (
-  studentProfile,
-  completionRate = 0
-) => {
+const formatStudentPublicProfile = (studentProfile, completionRate = 0) => {
   return {
-    student_profile_id:
-      studentProfile.student_profile_id,
+    student_profile_id: studentProfile.student_profile_id,
 
-    academic_level:
-      studentProfile.academic_level,
+    academic_level: studentProfile.academic_level,
 
-    learning_goals:
-      studentProfile.learning_goals,
+    learning_goals: studentProfile.learning_goals,
 
-    completion_rate: Number(
-      completionRate.toFixed(1)
-    ),
+    completion_rate: Number(completionRate.toFixed(1)),
 
     user: studentProfile.user
       ? {
-          user_id:
-            studentProfile.user.user_id,
+          user_id: studentProfile.user.user_id,
 
-          full_name:
-            studentProfile.user.full_name,
+          full_name: studentProfile.user.full_name,
 
-          avatar_url:
-            studentProfile.user?.avatar_url || null,
+          avatar_url: studentProfile.user?.avatar_url || null,
 
-          city:
-            studentProfile.user.city,
+          city: studentProfile.user.city,
         }
       : null,
   };
-};;
+};
 
-const findStudentProfile = async (
-  user_id,
-  options = {}
-) => {
-  const studentProfile =
-    await StudentProfile.findOne({
-      where: {
-        user_id,
-      },
-      ...options,
-    });
+const findStudentProfile = async (user_id, options = {}) => {
+  const studentProfile = await StudentProfile.findOne({
+    where: {
+      user_id,
+    },
+    ...options,
+  });
 
   if (!studentProfile) {
-    throw new NotFoundError(
-      "Student profile not found."
-    );
+    throw new NotFoundError("Student profile not found.");
   }
 
   return studentProfile;
 };
 
-const findStudentProfileById = async (
-  student_profile_id,
-  options = {}
-) => {
-  const studentProfile =
-    await StudentProfile.findByPk(
-      student_profile_id,
-      options
-    );
+const findStudentProfileById = async (student_profile_id, options = {}) => {
+  const studentProfile = await StudentProfile.findByPk(
+    student_profile_id,
+    options,
+  );
 
   if (!studentProfile) {
-    throw new NotFoundError(
-      "Student profile not found."
-    );
+    throw new NotFoundError("Student profile not found.");
   }
 
   return studentProfile;
 };
-
 
 module.exports = {
   studentProfileInclude,
   formatStudentProfile,
   formatStudentPublicProfile,
   findStudentProfile,
-  findStudentProfileById
+  findStudentProfileById,
 };
