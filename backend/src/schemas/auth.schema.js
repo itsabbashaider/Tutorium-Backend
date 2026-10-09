@@ -141,12 +141,12 @@ const loginSchema = Joi.object({
         "Email is required.",
     }),
 
-  password: passwordSchema.required(),
+  password: Joi.string().required(),
 });
 
 /*
 |--------------------------------------------------------------------------
-| Change Password
+| Change Password (In-App Settings)
 |--------------------------------------------------------------------------
 */
 const changePasswordSchema = Joi.object({
@@ -191,6 +191,26 @@ const changePasswordSchema = Joi.object({
   }
 
   return value;
+});
+
+/*
+|--------------------------------------------------------------------------
+| Reset Password via Q&A (Public Recovery Flow)
+|--------------------------------------------------------------------------
+*/
+const resetPasswordSchema = Joi.object({
+  resetToken: Joi.string()
+    .required()
+    .messages({
+      "string.empty": "Reset token is required.",
+      "any.required": "Reset token is required.",
+    }),
+
+  newPassword: passwordSchema
+    .required()
+    .messages({
+      "any.required": "New password is required.",
+    }),
 });
 
 /*
@@ -248,5 +268,6 @@ module.exports = {
   signupSchema,
   loginSchema,
   changePasswordSchema,
+  resetPasswordSchema,
   updateProfileSchema,
 };

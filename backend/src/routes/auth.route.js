@@ -8,7 +8,9 @@ const { authenticate } = require('../middlewares/auth.middleware');
 
 const {
         signupSchema,
-        loginSchema
+        loginSchema,
+        resetPasswordSchema,
+        changePasswordSchema,
       } = require('../schemas/auth.schema');
 
 const router = express.Router();
@@ -44,6 +46,37 @@ router.get(
   "/me",
   authenticate,
   AsyncHandler(authController.getMe)
+);
+
+// Protected route for users to set/update their Q&A in settings
+router.put(
+  '/security-qa',
+  authenticate,
+  AsyncHandler(authController.setupSecurityQA)
+);
+
+// Public routes for recovery flow
+router.post(
+  '/security-question',
+  AsyncHandler(authController.getSecurityQuestion)
+);
+
+router.post(
+  '/verify-security-answer',
+  AsyncHandler(authController.verifySecurityAnswer)
+);
+
+router.post(
+  '/reset-password-qa',
+  validateRequest(resetPasswordSchema), 
+  AsyncHandler(authController.resetPasswordWithQA)
+);
+
+router.post(
+  "/change-password",
+  authenticate, // Protects route so req.user is available
+  validateRequest(changePasswordSchema),
+  AsyncHandler(authController.changePassword)
 );
 
 module.exports = router;

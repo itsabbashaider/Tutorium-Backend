@@ -82,6 +82,31 @@ const getMe = asyncHandler(async (req, res) => {
   });
 });
 
+const setupSecurityQA = asyncHandler(async (req, res) => {
+  const result = await authService.setupSecurityQA(req.user.user_id, req.body);
+  return res.status(STATUS_CODES.OK).json({ success: true, ...result });
+});
+
+const getSecurityQuestion = asyncHandler(async (req, res) => {
+  const result = await authService.getSecurityQuestion(req.body);
+  return res.status(STATUS_CODES.OK).json({ success: true, ...result });
+});
+
+const verifySecurityAnswer = asyncHandler(async (req, res) => {
+  const result = await authService.verifySecurityAnswer(req.body);
+  return res.status(STATUS_CODES.OK).json({ success: true, ...result });
+});
+
+const resetPasswordWithQA = asyncHandler(async (req, res) => {
+  const result = await authService.resetPasswordWithQA(req.body);
+  return res.status(STATUS_CODES.OK).json({ success: true, ...result });
+});
+
+const changePassword = async (req, res) => {
+  const result = await authService.changePassword(req.user.user_id, req.body);
+  res.status(200).json({ status: "success", data: result });
+};
+
 module.exports = {
   register,
   login,
@@ -89,4 +114,9 @@ module.exports = {
   googleCallback,
   logout,
   getMe,
+  setupSecurityQA,
+  verifySecurityAnswer,
+  getSecurityQuestion,
+  resetPasswordWithQA,
+  changePassword,
 };

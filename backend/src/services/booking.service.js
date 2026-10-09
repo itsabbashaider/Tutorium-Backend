@@ -191,15 +191,20 @@ const getStudentBookings = async (user_id, query) => {
 
   const { page, limit, offset } = getPagination(query.page, query.limit);
 
+  // Build the where condition dynamically
+  const whereClause = {
+    student_profile_id: studentProfile.student_profile_id,
+  };
+
+  if (query.status) {
+    whereClause.status = query.status;
+  }
+
   const { count, rows } = await getBookings(
-    {
-      student_profile_id: studentProfile.student_profile_id,
-    },
+    whereClause,
     {
       include: bookingInclude,
-
       limit,
-
       offset,
     },
   );
@@ -223,15 +228,20 @@ const getTutorBookings = async (user_id, query) => {
 
   const { page, limit, offset } = getPagination(query.page, query.limit);
 
+  // Build the where condition dynamically
+  const whereClause = {
+    tutor_profile_id: tutorProfile.tutor_profile_id,
+  };
+
+  if (query.status) {
+    whereClause.status = query.status;
+  }
+
   const { count, rows } = await getBookings(
-    {
-      tutor_profile_id: tutorProfile.tutor_profile_id,
-    },
+    whereClause,
     {
       include: bookingInclude,
-
       limit,
-
       offset,
     },
   );

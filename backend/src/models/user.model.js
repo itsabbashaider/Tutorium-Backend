@@ -26,6 +26,37 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(255),
       allowNull: true
     },
+    google_id: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      unique: true,
+      field: 'google_id'
+    },
+    security_question_1: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      field: 'security_question_1'
+    },
+    security_answer_hash_1: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      field: 'security_answer_hash_1'
+    },
+    security_question_2: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      field: 'security_question_2'
+    },
+    security_answer_hash_2: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      field: 'security_answer_hash_2'
+    },
+    reset_password_expires: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      field: 'reset_password_expires'
+    },
     city: {
       type: DataTypes.STRING,
       allowNull: true
@@ -51,13 +82,12 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     tableName: 'users',
     timestamps: true,
-    paranoid: true, // Enables soft deletes because you have a deleted_at column
+    paranoid: true,
     underscored: true
   });
 
   User.associate = (models) => {
     User.hasOne(models.TutorProfile, { foreignKey: 'userId', as: 'tutorProfile' });
-    // Your StudentProfile association will tie in here once that file is generated
   };
 
   return User;
